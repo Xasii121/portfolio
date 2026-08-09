@@ -1115,7 +1115,7 @@ function revealAboutPhoto() {
   const frame = document.getElementById('aboutPhotoFrame');
   if (!frame) return;
   document.getElementById('about').scrollIntoView({ behavior: 'smooth', block: 'center' });
-  const photoSrc = document.getElementById('aboutPhotoImg').src;
+  const photoSrc = document.getElementById('aboutPhotoImg').getAttribute('src');
   frame.querySelectorAll('.id-glitch-slice').forEach(s => s.style.backgroundImage = `url(${photoSrc})`);
   const fire = () => {
     frame.classList.add('revealed', 'glitching');
