@@ -1115,8 +1115,15 @@ function revealAboutPhoto() {
   const frame = document.getElementById('aboutPhotoFrame');
   if (!frame) return;
   document.getElementById('about').scrollIntoView({ behavior: 'smooth', block: 'center' });
-  const photoSrc = document.getElementById('aboutPhotoImg').getAttribute('src');
-  frame.querySelectorAll('.id-glitch-slice').forEach(s => s.style.backgroundImage = `url(${photoSrc})`);
+  
+  // Foolproof fallback path for GitHub Pages subfolders
+  const imgElement = document.getElementById('aboutPhotoImg');
+  const photoSrc = imgElement ? (imgElement.getAttribute('src') || 'img_4754.jpg') : 'img_4754.jpg';
+  
+  frame.querySelectorAll('.id-glitch-slice').forEach(s => {
+    s.style.backgroundImage = `url(${photoSrc})`;
+  });
+
   const fire = () => {
     frame.classList.add('revealed', 'glitching');
     if (window.sfx && sfx.enabled) sfx.playGlitch();
@@ -1124,52 +1131,6 @@ function revealAboutPhoto() {
   };
   setTimeout(fire, 350);
 }
-
-function renderCmdk(query = '') {
-  const q = query.toLowerCase();
-  const filtered = commands.filter(c => c.title.toLowerCase().includes(q) || c.sub.toLowerCase().includes(q));
-  
-  if (filtered.length === 0) {
-    cmdkList.innerHTML = `<div class="cmdk-empty">No commands found.</div>`;
-    return;
-  }
-
-  cmdkList.innerHTML = filtered.map((c, i) => `
-    <div class="cmdk-item" data-idx="${i}">
-      <span>${c.title}</span><span class="cmdk-sub">${c.sub}</span>
-    </div>
-  `).join('');
-  
-  document.querySelectorAll('.cmdk-item').forEach(el => {
-    el.addEventListener('click', () => {
-      filtered[Number(el.dataset.idx)].action();
-      window.closeCmdk();
-    });
-  });
-}
-
-window.closeCmdk = () => { 
-  cmdkOverlay.classList.remove('active'); 
-  cmdkInput.value = ''; 
-  sfx.playPaletteClose(); 
-  sfx.duck(false); 
-};
-
-cmdkOpenBtn.addEventListener('click', () => { 
-  cmdkOverlay.classList.add('active'); 
-  cmdkInput.focus(); 
-  renderCmdk(); 
-  sfx.playPaletteOpen(); 
-  sfx.duck(true); 
-});
-
-addEventListener('keydown', e => {
-  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-    e.preventDefault();
-    cmdkOverlay.classList.contains('active') ? window.closeCmdk() : cmdkOpenBtn.click();
-  }
-});
-cmdkInput.addEventListener('input', (e) => renderCmdk(e.target.value));
 
 // SITE-WIDE AMBIENT AUDIO ENGINE
 class SandPouringAudio {
