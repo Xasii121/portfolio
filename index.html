@@ -593,10 +593,10 @@ footer{padding:35px 0 60px;color:#71857d;font-size:.78rem;display:flex;justify-c
         <button class="close-term" id="closeTerm" aria-label="Close Terminal">[X]</button>
         <div class="terminal-output" id="terminalOutput">
           <p>Initialize sys.link... OK.</p>
-          <p>Type 'help', 'ping', 'status', 'skills', 'traceroute', 'whoami', 'sudo', 'matrix', or 'clear'.</p>
+          <p>Type 'help' for commands — try 'enable', 'show ip route', or 'subnet 192.168.1.0/24'.</p>
         </div>
         <div class="terminal-input-line">
-          <span>user@node-01:~$</span>
+          <span id="termPrompt">user@node-01:~$</span>
           <input type="text" id="terminalInput" autocomplete="off" spellcheck="false">
         </div>
       </div>
@@ -886,6 +886,9 @@ const termOverlay = document.getElementById('terminalOverlay');
 const termInput = document.getElementById('terminalInput');
 const termOutput = document.getElementById('terminalOutput');
 const closeTerm = document.getElementById('closeTerm');
+const termPrompt = document.getElementById('termPrompt');
+let termMode = 'user';
+function setTermMode(m){termMode=m;termPrompt.textContent = m==='config' ? 'Router(config)#' : m==='priv' ? 'Router#' : 'user@node-01:~$';}
 
 let cmdHistory = [];
 let historyIndex = -1;
@@ -914,8 +917,8 @@ termInput.addEventListener('keydown', (e) => {
     }
     termOutput.innerHTML += `\n<span style="color:var(--muted)">> ${val}</span>`;
     
-    const knownCommands = ['ping','ping sasindu.dev','status','skills','traceroute','help','whoami','ls work','matrix','exit','clear'];
-    const isKnown = knownCommands.includes(val) || val.startsWith('sudo');
+    const knownCommands = ['ping','ping sasindu.dev','status','skills','traceroute','help','whoami','ls work','matrix','exit','clear','enable','configure terminal','end','show ip route','show vlan brief'];
+    const isKnown = knownCommands.includes(val) || val.startsWith('sudo') || val.startsWith('subnet ');
     if (val !== '') { isKnown ? sfx.playConfirm() : sfx.playError(); }
 
     if (val === 'ping' || val === 'ping sasindu.dev') {
@@ -927,7 +930,35 @@ termInput.addEventListener('keydown', (e) => {
     } else if (val === 'traceroute') {
         termOutput.innerHTML += `\ntraceroute to sasindu.dev, 30 hops max\n 1 gateway (192.168.1.1) 1.2ms\n 2 isp-backbone.lk 8.4ms\n 3 sasindu.dev [OK] 14.2ms`;
     } else if (val === 'help') {
-        termOutput.innerHTML += `\nCommands: ping, status, skills, traceroute, whoami, ls work, sudo, matrix, clear, exit`;
+        termOutput.innerHTML += `\nCommands: ping, status, skills, traceroute, whoami, ls work, sudo, matrix, clear, exit, enable, configure terminal, show ip route, show vlan brief, subnet <ip/cidr>`;
+    } else if (val === 'enable') {
+        setTermMode('priv');
+        termOutput.innerHTML += `\nPassword: ****\nRouter#`;
+    } else if (val === 'configure terminal') {
+        setTermMode('config');
+        termOutput.innerHTML += `\nEnter configuration commands, one per line. End with CNTL/Z.\nRouter(config)#`;
+    } else if (val === 'end') {
+        setTermMode('user');
+        termOutput.innerHTML += `\nuser@node-01:~$`;
+    } else if (val === 'show ip route') {
+        termOutput.innerHTML += `\nCodes: C - connected, S - static, O - OSPF\nC  192.168.1.0/24 is directly connected, Fa0/0\nC  192.168.10.0/24 is directly connected, Vlan10\nS* 0.0.0.0/0 [1/0] via 192.168.1.1`;
+    } else if (val === 'show vlan brief') {
+        termOutput.innerHTML += `\nVLAN  Name        Status    Ports\n1     default     active    Fa0/1, Fa0/2\n10    ADMIN       active    Fa0/3\n20    IOT         active    Fa0/4`;
+    } else if (val.startsWith('subnet ')) {
+        const arg = val.slice(7).trim();
+        const [ip, cidrStr] = arg.split('/');
+        const cidr = parseInt(cidrStr);
+        const ipInt = ipToInt((ip||'').trim());
+        if (ipInt === null || isNaN(cidr) || cidr < 0 || cidr > 32) {
+            termOutput.innerHTML += `\nUsage: subnet <ip>/<cidr>  e.g. subnet 192.168.1.0/24`;
+        } else {
+            const maskInt = cidr === 0 ? 0 : (0xFFFFFFFF << (32 - cidr)) >>> 0;
+            const netInt = (ipInt & maskInt) >>> 0;
+            const bcInt = (netInt | (~maskInt >>> 0)) >>> 0;
+            const total = Math.pow(2, 32 - cidr);
+            const usable = total > 2 ? total - 2 : total;
+            termOutput.innerHTML += `\nNetwork:    ${intToIp(netInt)}/${cidr}\nMask:       ${intToIp(maskInt)}\nBroadcast:  ${intToIp(bcInt)}\nUsable:     ${usable.toLocaleString()} hosts`;
+        }
     } else if (val === 'ls work') {
         termOutput.innerHTML += `\ndrwxr-xr-x  linkedin  -> <a href="https://www.linkedin.com/in/sasindu-dias" target="_blank" rel="noopener" style="color:var(--aqua);text-decoration:underline">linkedin.com/in/sasindu-dias</a>\ndrwxr-xr-x  github    -> <a href="https://github.com/SasinduRoshan" target="_blank" rel="noopener" style="color:var(--aqua);text-decoration:underline">github.com/SasinduRoshan</a>`;
     } else if (val === 'whoami') {
@@ -1115,15 +1146,8 @@ function revealAboutPhoto() {
   const frame = document.getElementById('aboutPhotoFrame');
   if (!frame) return;
   document.getElementById('about').scrollIntoView({ behavior: 'smooth', block: 'center' });
-  
-  // Foolproof fallback path for GitHub Pages subfolders
-  const imgElement = document.getElementById('aboutPhotoImg');
-  const photoSrc = imgElement ? (imgElement.getAttribute('src') || 'img_4754.jpg') : 'img_4754.jpg';
-  
-  frame.querySelectorAll('.id-glitch-slice').forEach(s => {
-    s.style.backgroundImage = `url(${photoSrc})`;
-  });
-
+  const photoSrc = document.getElementById('aboutPhotoImg').src;
+  frame.querySelectorAll('.id-glitch-slice').forEach(s => s.style.backgroundImage = `url(${photoSrc})`);
   const fire = () => {
     frame.classList.add('revealed', 'glitching');
     if (window.sfx && sfx.enabled) sfx.playGlitch();
@@ -1131,6 +1155,52 @@ function revealAboutPhoto() {
   };
   setTimeout(fire, 350);
 }
+
+function renderCmdk(query = '') {
+  const q = query.toLowerCase();
+  const filtered = commands.filter(c => c.title.toLowerCase().includes(q) || c.sub.toLowerCase().includes(q));
+  
+  if (filtered.length === 0) {
+    cmdkList.innerHTML = `<div class="cmdk-empty">No commands found.</div>`;
+    return;
+  }
+
+  cmdkList.innerHTML = filtered.map((c, i) => `
+    <div class="cmdk-item" data-idx="${i}">
+      <span>${c.title}</span><span class="cmdk-sub">${c.sub}</span>
+    </div>
+  `).join('');
+  
+  document.querySelectorAll('.cmdk-item').forEach(el => {
+    el.addEventListener('click', () => {
+      filtered[Number(el.dataset.idx)].action();
+      window.closeCmdk();
+    });
+  });
+}
+
+window.closeCmdk = () => { 
+  cmdkOverlay.classList.remove('active'); 
+  cmdkInput.value = ''; 
+  sfx.playPaletteClose(); 
+  sfx.duck(false); 
+};
+
+cmdkOpenBtn.addEventListener('click', () => { 
+  cmdkOverlay.classList.add('active'); 
+  cmdkInput.focus(); 
+  renderCmdk(); 
+  sfx.playPaletteOpen(); 
+  sfx.duck(true); 
+});
+
+addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    cmdkOverlay.classList.contains('active') ? window.closeCmdk() : cmdkOpenBtn.click();
+  }
+});
+cmdkInput.addEventListener('input', (e) => renderCmdk(e.target.value));
 
 // SITE-WIDE AMBIENT AUDIO ENGINE
 class SandPouringAudio {
