@@ -951,7 +951,7 @@ termInput.addEventListener('keydown', (e) => {
         termOverlay.classList.remove('active');
         sfx.duck(false);
         revealAboutPhoto();
-    } else if (val === 'sudo rm -rf ') {
+    } else if (val === 'sudo rm -rf /') {
         runRmRf();
         termInput.value = '';
         return;
