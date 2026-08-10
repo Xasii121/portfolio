@@ -12,6 +12,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <!-- D3.js for the interactive draggable network topology graph -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<!-- Google reCAPTCHA v2 for contact form spam protection -->
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <style>
 :root{
   --bg:#020403;--text:#f5fff9;--muted:#a5b8b0;--green:#64ffad;--aqua:#67f7ff;--yellow:#f5c518;
@@ -749,6 +751,7 @@ footer{padding:35px 0 60px;color:#71857d;font-size:.78rem;display:flex;justify-c
       <div class="field"><label for="cf-email">Email</label><input id="cf-email" name="email" type="email" placeholder="you@example.com" required></div>
     </div>
     <div class="field"><label for="cf-message">Message</label><textarea id="cf-message" name="message" placeholder="What's on your mind?" required></textarea></div>
+    <div class="g-recaptcha" data-sitekey="6LcCdX8tAAAAAFNAB2Ui3rAR-EYQDU54-zDkeiaS"></div>
     <button class="btn primary form-submit" type="submit">Send <span id="sendArrow">→</span></button>
     <div class="form-status" id="formStatus"></div>
   </form>
