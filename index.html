@@ -333,6 +333,31 @@ h1{font-size:clamp(4.4rem,13vw,10rem);line-height:.8;letter-spacing:-.09em;margi
   text-transform: uppercase;
 }
 
+/* CERTS/SKILLS — SKELETON LOADING */
+@keyframes shimmer { 0%{background-position:-300px 0} 100%{background-position:300px 0} }
+.skel { border-radius: 18px; background: linear-gradient(90deg, rgba(255,255,255,.04) 25%, rgba(255,255,255,.09) 37%, rgba(255,255,255,.04) 63%); background-size: 400px 100%; animation: shimmer 1.4s linear infinite; }
+.skel-badge { width: 100%; max-width: 220px; aspect-ratio: 1/1; margin: 0 auto; border-radius: 18px; }
+.skel-line { height: 14px; margin: 10px 0; }
+.skel-tag { height: 30px; width: 90px; border-radius: 999px; display: inline-block; }
+
+/* CERTS/SKILLS — STAGGERED ENTRANCE */
+@keyframes certPop { 0%{opacity:0; transform:translateY(24px) scale(.96)} 100%{opacity:1; transform:translateY(0) scale(1)} }
+.cert-anim { opacity: 0; animation: certPop .65s var(--ease) forwards; }
+@keyframes tagPop { 0%{opacity:0; transform:translateY(10px) scale(.85)} 60%{opacity:1; transform:translateY(-2px) scale(1.03)} 100%{opacity:1; transform:translateY(0) scale(1)} }
+.tag-anim { opacity: 0; animation: tagPop .5s var(--ease) forwards; }
+
+/* SKILLS — CATEGORY FILTER TABS */
+.skill-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.skill-filter-btn { font-family: ui-monospace, monospace; font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.03); color: var(--muted); cursor: pointer; transition: .3s var(--ease); }
+.skill-filter-btn:hover { color: var(--text); border-color: rgba(120,255,210,.35); }
+.skill-filter-btn.active { color: #00140b; background: var(--green); border-color: var(--green); box-shadow: 0 0 18px rgba(100,255,173,.35); }
+.tags #skillsTags .tag.tag-hidden { display: none; }
+
+/* CERTS — COUNTER BADGE */
+.cert-count-badge { font-family: ui-monospace, monospace; font-size: .68rem; letter-spacing: .1em; color: var(--green); background: rgba(100,255,173,.08); border: 1px solid rgba(100,255,173,.25); padding: 5px 12px; border-radius: 999px; margin-left: 10px; display: inline-flex; align-items: center; gap: 6px; }
+.cert-count-badge .dot-pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); animation: dotPulse 1.6s ease-in-out infinite; }
+@keyframes dotPulse { 0%,100%{opacity:1; transform:scale(1)} 50%{opacity:.4; transform:scale(.7)} }
+
 section{padding:120px 0}.head{display:flex;justify-content:space-between;align-items:end;gap:25px;margin-bottom:35px}.kicker{font:700 .72rem ui-monospace,monospace;color:var(--green);letter-spacing:.13em;text-transform:uppercase}.head h2{font-size:clamp(2.7rem,6vw,5.5rem);line-height:.9;letter-spacing:-.075em;margin:12px 0 0}.head p{max-width:400px;color:var(--muted);line-height:1.7}
 .about{display:grid;grid-template-columns:1.12fr .88fr;gap:16px}.card{border-radius:30px;padding:34px}.card p{color:#b6c8c1;line-height:1.9}.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}.stat{border-radius:25px;min-height:145px;padding:23px;display:flex;flex-direction:column;justify-content:space-between;transition: transform 0.3s ease;}.stat:hover{transform: translateY(-5px);}.stat strong{font-size:2rem;letter-spacing:-.06em}.stat span{font-size:.78rem;color:#9ab0a6}
 .projects{display:grid;gap:16px}.project{min-height:390px;border-radius:34px;padding:32px;position:relative;overflow:hidden;isolation:isolate;transition:.55s var(--ease)}.project:hover{transform:translateY(-7px);border-color:rgba(180,255,220,.25)}.project:before{content:"";position:absolute;inset:0;z-index:-2;background:radial-gradient(circle at 80% 20%,rgba(90,247,255,.2),transparent 28%),radial-gradient(circle at 25% 80%,rgba(82,255,166,.16),transparent 32%)}.project:after{content:"";position:absolute;width:430px;height:430px;border-radius:50%;right:-180px;top:-170px;border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 0 90px rgba(90,255,195,.08);z-index:-1;transition:.7s var(--ease)}.project:hover:after{transform:scale(1.2) translate(-25px,20px)}.meta{display:flex;justify-content:space-between;color:#91aaa0;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em}.project h3{font-size:clamp(2.4rem,6vw,5rem);letter-spacing:-.075em;line-height:.9;margin:16px 0}.project p{max-width:620px;color:#b2c5bd;line-height:1.75}.bottom{display:flex;justify-content:space-between;align-items:end;margin-top:38px}.tags{display:flex;gap:7px;flex-wrap:wrap}.tag{border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.15);border-radius:999px;padding:8px 11px;font-size:.72rem;color:#b6cbc3;transition: transform 0.2s ease, border-color 0.2s ease;}.tag:hover{transform: translateY(-2px); border-color: var(--green);}
@@ -637,37 +662,13 @@ footer{padding:35px 0 60px;color:#71857d;font-size:.78rem;display:flex;justify-c
 
 <!-- CERTIFICATIONS & SKILLS SECTION -->
 <section id="skills"><div class="wrap">
-  <div class="head reveal"><div><div class="kicker">02 / Certifications & Skills</div><h2>Learning &<br>Capabilities.</h2></div><p>Expanding my technical toolkit through formal certifications and hands-on explorations in modern technology.</p></div>
-  <div class="cert-grid">
-    <div class="cert-card reveal">
-      <div class="cert-inner glass" id="certBadge">
-        <div class="cert-glow"></div>
-        <img src="Digital Sticker_Introduction to Large Language Models.png" alt="IBM SkillsBuild - Introduction to Large Language Models Certificate" class="cert-badge-img" width="220" height="220">
-      </div>
-    </div>
-    <div class="cert-info reveal">
-      <span class="cert-issuer">IBM SkillsBuild</span>
-      <h3 class="scramble-hover" data-value="Introduction to Large Language Models">Introduction to Large Language Models</h3>
-      <p style="color: var(--muted); line-height: 1.8;">Validated expertise in fundamental AI architecture, Large Language Models (LLMs), natural language processing, and modern prompt design principles.</p>
-      <div class="tags" style="margin-top: 20px;">
-        <span class="tag scramble-hover" data-value="Large Language Models">Large Language Models</span>
-        <span class="tag scramble-hover" data-value="Generative AI">Generative AI</span>
-        <span class="tag scramble-hover" data-value="IBM SkillsBuild">IBM SkillsBuild</span>
-        <span class="tag scramble-hover" data-value="Prompt Design">Prompt Design</span>
-      </div>
-    </div>
-  </div>
+  <div class="head reveal"><div><div class="kicker">02 / Certifications & Skills <span class="cert-count-badge" id="certCountBadge" style="display:none"><span class="dot-pulse"></span><span id="certCountText">0 certs</span></span></div><h2>Learning &<br>Capabilities.</h2></div><p>Expanding my technical toolkit through formal certifications and hands-on explorations in modern technology.</p></div>
+  <div class="cert-grid" id="certGrid"><!-- populated from data/certs.json --></div>
 
-  <div class="reveal" style="margin-top:44px">
+  <div class="reveal" style="margin-top:44px" id="skillsWrap">
     <span class="cert-issuer">Core Skills</span>
-    <div class="tags" style="margin-top:16px">
-      <span class="tag scramble-hover" data-value="Linux">Linux</span>
-      <span class="tag scramble-hover" data-value="Networking Fundamentals">Networking Fundamentals</span>
-      <span class="tag scramble-hover" data-value="Cisco Packet Tracer">Cisco Packet Tracer</span>
-      <span class="tag scramble-hover" data-value="Subnetting & VLANs">Subnetting & VLANs</span>
-      <span class="tag scramble-hover" data-value="Web Development">Web Development</span>
-      <span class="tag scramble-hover" data-value="JavaScript">JavaScript</span>
-    </div>
+    <div class="skill-filters" id="skillFilters"><!-- populated from skills.json categories --></div>
+    <div class="tags" id="skillsTags"><!-- populated from data/skills.json --></div>
   </div>
 </div></section>
 
@@ -1651,25 +1652,7 @@ if(container && typeof THREE !== 'undefined' && !prefersReducedMotion) {
   });
 }
 
-// 3D TILT & GLOW INTERACTION
-const certBadge = document.getElementById('certBadge');
-if(certBadge) {
-  certBadge.addEventListener('mousemove', (e) => {
-    const rect = certBadge.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const rotX = -((y - rect.height/2) / (rect.height/2)) * 18;
-    const rotY = ((x - rect.width/2) / (rect.width/2)) * 18;
-    
-    certBadge.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.03, 1.03, 1.03)`;
-    certBadge.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
-    certBadge.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
-  });
-
-  certBadge.addEventListener('mouseleave', () => {
-    certBadge.style.transform = `rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-  });
-}
+// 3D TILT & GLOW INTERACTION — now handled by enableTilt() after certs.json loads (see loadCertsAndSkills)
 
 // MATRIX TEXT SCRAMBLE EFFECT
 const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ0123456789@#$&=+%';
@@ -1806,6 +1789,131 @@ document.querySelectorAll('.case-study-btn').forEach(btn => {
 });
 
 /* D3.JS INTERACTIVE DRAGGABLE TOPOLOGY GRAPH */
+/* CERTS & SKILLS — fetched from data/certs.json and data/skills.json, with skeleton loading + staggered animation */
+(function loadCertsAndSkills(){
+  const certGrid = document.getElementById('certGrid');
+  const skillsTags = document.getElementById('skillsTags');
+  const skillFilters = document.getElementById('skillFilters');
+  const countBadge = document.getElementById('certCountBadge');
+  const countText = document.getElementById('certCountText');
+
+  // Rebind hover interactions (scramble text + custom cursor) for elements injected after page load
+  function rebindInteractions(root) {
+    root.querySelectorAll('.scramble-hover').forEach(el => {
+      el.addEventListener('mouseenter', () => scrambleText(el));
+    });
+    const cursor = document.querySelector('.cursor');
+    root.querySelectorAll('a, .btn, .cert-inner, .scramble-hover').forEach(a => {
+      a.onmouseenter = () => {
+        if (!cursor) return;
+        cursor.style.width = '50px'; cursor.style.height = '50px'; cursor.style.background = 'rgba(100,255,173,.06)';
+        if (sfx.enabled) sfx.playHover();
+      };
+      a.onmouseleave = () => {
+        if (!cursor) return;
+        cursor.style.width = '25px'; cursor.style.height = '25px'; cursor.style.background = 'transparent';
+      };
+    });
+  }
+
+  // --- CERTS ---
+  if (certGrid) {
+    // Skeleton placeholder while loading
+    certGrid.innerHTML = `
+      <div class="cert-card"><div class="cert-inner glass"><div class="skel skel-badge"></div></div></div>
+      <div>
+        <div class="skel skel-line" style="width:35%"></div>
+        <div class="skel skel-line" style="width:70%;height:34px"></div>
+        <div class="skel skel-line" style="width:95%"></div>
+        <div class="skel skel-line" style="width:80%"></div>
+      </div>`;
+
+    fetch('data/certs.json')
+      .then(res => res.json())
+      .then(certs => {
+        certGrid.innerHTML = certs.map((c, i) => `
+          <div class="cert-card cert-anim" style="animation-delay:${i * 0.12}s">
+            <div class="cert-inner glass" id="certBadge${i}">
+              <div class="cert-glow"></div>
+              <img src="${c.badgeImg}" alt="${c.issuer} - ${c.title} Certificate" class="cert-badge-img" width="220" height="220">
+            </div>
+          </div>
+          <div class="cert-info cert-anim" style="animation-delay:${i * 0.12 + 0.08}s">
+            <span class="cert-issuer">${c.issuer}${c.date ? ' · ' + c.date : ''}</span>
+            <h3 class="scramble-hover" data-value="${c.title}">${c.title}</h3>
+            <p style="color: var(--muted); line-height: 1.8;">${c.description}</p>
+            <div class="tags" style="margin-top: 20px;">
+              ${c.tags.map((t, ti) => `<span class="tag scramble-hover tag-anim" data-value="${t}" style="animation-delay:${i * 0.12 + 0.15 + ti * 0.05}s">${t}</span>`).join('')}
+            </div>
+          </div>
+        `).join('');
+
+        rebindInteractions(certGrid);
+        enableTilt(certGrid);
+
+        if (countBadge && countText) {
+          countText.textContent = `${certs.length} ${certs.length === 1 ? 'cert' : 'certs'} earned`;
+          countBadge.style.display = 'inline-flex';
+        }
+      })
+      .catch(err => console.error('Failed to load certs.json', err));
+  }
+
+  // --- SKILLS (with animated category filter tabs) ---
+  if (skillsTags) {
+    skillsTags.innerHTML = `<span class="skel skel-tag"></span><span class="skel skel-tag"></span><span class="skel skel-tag"></span><span class="skel skel-tag"></span>`;
+
+    fetch('data/skills.json')
+      .then(res => res.json())
+      .then(skills => {
+        const categories = ['All', ...new Set(skills.map(s => s.category).filter(Boolean))];
+
+        function renderTags(filter) {
+          const visible = filter === 'All' ? skills : skills.filter(s => s.category === filter);
+          skillsTags.innerHTML = visible.map((s, i) =>
+            `<span class="tag scramble-hover tag-anim" data-value="${s.name}" style="animation-delay:${i * 0.045}s">${s.name}</span>`
+          ).join('');
+          rebindInteractions(skillsTags);
+        }
+
+        if (skillFilters && categories.length > 2) {
+          skillFilters.innerHTML = categories.map((cat, i) =>
+            `<button class="skill-filter-btn${i === 0 ? ' active' : ''}" data-cat="${cat}">${cat}</button>`
+          ).join('');
+          skillFilters.querySelectorAll('.skill-filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              skillFilters.querySelectorAll('.skill-filter-btn').forEach(b => b.classList.remove('active'));
+              btn.classList.add('active');
+              if (sfx.enabled) sfx.playClick();
+              renderTags(btn.dataset.cat);
+            });
+          });
+        }
+
+        renderTags('All');
+      })
+      .catch(err => console.error('Failed to load skills.json', err));
+  }
+})();
+
+// Reusable 3D tilt + glow effect for cert badges (mirrors original certBadge behavior)
+function enableTilt(root) {
+  root.querySelectorAll('.cert-inner').forEach(certBadge => {
+    certBadge.addEventListener('mousemove', (e) => {
+      const rect = certBadge.getBoundingClientRect();
+      const x = e.clientX - rect.left, y = e.clientY - rect.top;
+      const rotX = ((y / rect.height) - 0.5) * -14;
+      const rotY = ((x / rect.width) - 0.5) * 14;
+      certBadge.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.03, 1.03, 1.03)`;
+      certBadge.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
+      certBadge.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
+    });
+    certBadge.addEventListener('mouseleave', () => {
+      certBadge.style.transform = `rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+    });
+  });
+}
+
 (function initTopoGraph(){
   const svgEl = document.getElementById('topoGraphSvg');
   if (!svgEl || typeof d3 === 'undefined') return;
