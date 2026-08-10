@@ -1382,7 +1382,7 @@ if (contactForm) {
   const submitBtn = contactForm.querySelector('.form-submit');
   contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (contactForm.action.includes('YOUR_FORM_ID')) {
+    if (contactForm.action.includes('YOUR_FORM_ID_PLACEHOLDER')) {
       formStatus.textContent = 'Contact form not set up yet — add your Formspree endpoint.';
       formStatus.className = 'form-status err';
       sfx.playFormError();
