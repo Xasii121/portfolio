@@ -1,0 +1,8 @@
+[
+  { "name": "Linux", "category": "Systems" },
+  { "name": "Networking Fundamentals", "category": "Networking" },
+  { "name": "Cisco Packet Tracer", "category": "Networking" },
+  { "name": "Subnetting & VLANs", "category": "Networking" },
+  { "name": "Web Development", "category": "Development" },
+  { "name": "JavaScript", "category": "Development" }
+]
