@@ -1,0 +1,22 @@
+{
+  "name": "Sasindu Roshan — Network Engineer",
+  "short_name": "Sasindu Roshan",
+  "description": "Portfolio of Sasindu Roshan, exploring networking, systems, and web engineering from Sri Lanka.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#020504",
+  "theme_color": "#020504",
+  "icons": [
+    {
+      "src": "profile-web.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "profile-web.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
