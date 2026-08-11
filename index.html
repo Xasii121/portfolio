@@ -8,6 +8,8 @@
 <meta property="og:title" content="Sasindu Roshan — Network Engineer">
 <meta property="og:description" content="Portfolio of Sasindu Roshan, exploring networking, systems, and web engineering from Sri Lanka.">
 <title>Sasindu Roshan — Network Engineer</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="profile-web.jpg">
 <!-- Three.js library for 3D WebGL Point-Cloud Particle rendering -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <!-- D3.js for the interactive draggable network topology graph -->
@@ -606,13 +608,14 @@ footer{padding:35px 0 60px;color:#71857d;font-size:.78rem;display:flex;justify-c
       <a class="btn primary" href="#work">Explore my work ↗</a>
       <a class="btn" href="#contact">Let's connect</a>
       <a class="btn" href="#" id="cvDownloadBtn">Download CV 📄</a>
+      <button class="btn" id="shareBtn" style="display:none">Share 📤</button>
     </div>
     
     <!-- 3D GLASS HERO CARD STAGE WITH TERMINAL INTERACTION -->
     <div class="network-stage glass reveal" id="networkStage" aria-label="Interactive Network Visualization">
       <div class="stage-hud">
         <span class="scramble-hover" data-value="SYS / ONLINE">SYS / ONLINE</span>
-        <span class="scramble-hover" data-value="Open Terminal">Open Terminal</span>
+        <span class="scramble-hover" data-value="NETWORK NODE 01">NETWORK NODE 01</span>
       </div>
       
       <div id="webgl-canvas"></div>
@@ -758,7 +761,7 @@ footer{padding:35px 0 60px;color:#71857d;font-size:.78rem;display:flex;justify-c
   </form>
 </div></div></div></section>
 </main>
-<footer class="wrap"><span>© 2026 Sasindu Roshan</span><span>· Sri Lanka</span></footer>
+<footer class="wrap"><span>© 2026 Sasindu Roshan</span><span>Liquid glass · Sri Lanka</span></footer>
 
 <!-- CASE STUDY / POST-MORTEM MODAL -->
 <div class="modal-overlay" id="caseModalOverlay">
@@ -808,6 +811,32 @@ footer{padding:35px 0 60px;color:#71857d;font-size:.78rem;display:flex;justify-c
 </div>
 
 <script>
+/* DEVICE DETECTION — used to gate/reduce heavy effects on phones */
+const isTouch = window.matchMedia('(pointer: coarse)').matches;
+const isNarrow = window.innerWidth <= 760;
+const isMobile = isTouch && isNarrow;
+document.documentElement.classList.toggle('is-mobile', isMobile);
+
+// NATIVE SHARE — shows a real device share sheet where supported (mainly mobile browsers)
+const shareBtn = document.getElementById('shareBtn');
+if (shareBtn) {
+  if (navigator.share) {
+    shareBtn.style.display = '';
+    shareBtn.addEventListener('click', async () => {
+      try {
+        await navigator.share({
+          title: document.title,
+          text: 'Check out this portfolio — Sasindu Roshan, Network Engineering student.',
+          url: location.href,
+        });
+        if (sfx.enabled) sfx.playClick();
+      } catch (err) {
+        // user cancelled the share sheet — no action needed
+      }
+    });
+  }
+}
+
 // LIVE LATENCY PING WIDGET
 async function checkLatency() {
   const start = performance.now();
@@ -1367,17 +1396,20 @@ window.addEventListener('load', () => {
   }, 2200);
 });
 
-// CURSOR FOLLOW
-const cursor=document.querySelector('.cursor'),dot=document.querySelector('.dot');let mx=innerWidth/2,my=innerHeight/2,cx=mx,cy=my;
-addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY});
-(function loop(){cx+=(mx-cx)*.16;cy+=(my-cy)*.16;cursor.style.left=cx+'px';cursor.style.top=cy+'px';dot.style.left=mx+'px';dot.style.top=my+'px';requestAnimationFrame(loop)})();
-document.querySelectorAll('a, .btn, .cert-inner, .nav-pill, .theme-dot, .scramble-hover').forEach(a=>{
-  a.onmouseenter=()=>{
-    cursor.style.width='50px';cursor.style.height='50px';cursor.style.background='rgba(100,255,173,.06)';
-    if(sfx.enabled) sfx.playHover();
-  };
-  a.onmouseleave=()=>{cursor.style.width='25px';cursor.style.height='25px';cursor.style.background='transparent'};
-});
+// CURSOR FOLLOW — desktop only, this was running an invisible RAF loop on mobile before
+const cursor=document.querySelector('.cursor'),dot=document.querySelector('.dot');
+if (!isMobile && cursor && dot) {
+  let mx=innerWidth/2,my=innerHeight/2,cx=mx,cy=my;
+  addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY});
+  (function loop(){cx+=(mx-cx)*.16;cy+=(my-cy)*.16;cursor.style.left=cx+'px';cursor.style.top=cy+'px';dot.style.left=mx+'px';dot.style.top=my+'px';requestAnimationFrame(loop)})();
+  document.querySelectorAll('a, .btn, .cert-inner, .nav-pill, .theme-dot, .scramble-hover').forEach(a=>{
+    a.onmouseenter=()=>{
+      cursor.style.width='50px';cursor.style.height='50px';cursor.style.background='rgba(100,255,173,.06)';
+      if(sfx.enabled) sfx.playHover();
+    };
+    a.onmouseleave=()=>{cursor.style.width='25px';cursor.style.height='25px';cursor.style.background='transparent'};
+  });
+}
 
 // CONTACT FORM SUBMISSION UPGRADE
 const contactForm = document.getElementById('contactForm');
@@ -1458,7 +1490,7 @@ addEventListener('pointermove',e=>{const x=(e.clientX/innerWidth-.5)*35,y=(e.cli
 // THREE.JS WEBGL PARTICLE NETWORK
 const container = document.getElementById('webgl-canvas');
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-if(container && typeof THREE !== 'undefined' && !prefersReducedMotion) {
+if(container && typeof THREE !== 'undefined' && !prefersReducedMotion && !isMobile) {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
   camera.position.z = 15;
@@ -1677,7 +1709,12 @@ function scrambleText(element) {
 }
 
 document.querySelectorAll('.scramble-hover').forEach(el => {
-  el.addEventListener('mouseenter', () => scrambleText(el));
+  if (isMobile) {
+    // Touch devices have no hover — trigger the same effect on tap instead
+    el.addEventListener('click', () => scrambleText(el), { passive: true });
+  } else {
+    el.addEventListener('mouseenter', () => scrambleText(el));
+  }
 });
 
 /* MODAL HELPERS */
@@ -1797,11 +1834,16 @@ document.querySelectorAll('.case-study-btn').forEach(btn => {
   const countBadge = document.getElementById('certCountBadge');
   const countText = document.getElementById('certCountText');
 
-  // Rebind hover interactions (scramble text + custom cursor) for elements injected after page load
+  // Rebind interactions for elements injected after page load — hover on desktop, tap on mobile
   function rebindInteractions(root) {
     root.querySelectorAll('.scramble-hover').forEach(el => {
-      el.addEventListener('mouseenter', () => scrambleText(el));
+      if (isMobile) {
+        el.addEventListener('click', () => scrambleText(el), { passive: true });
+      } else {
+        el.addEventListener('mouseenter', () => scrambleText(el));
+      }
     });
+    if (isMobile) return; // cursor is disabled on mobile, nothing else to bind
     const cursor = document.querySelector('.cursor');
     root.querySelectorAll('a, .btn, .cert-inner, .scramble-hover').forEach(a => {
       a.onmouseenter = () => {
@@ -1849,7 +1891,7 @@ document.querySelectorAll('.case-study-btn').forEach(btn => {
         `).join('');
 
         rebindInteractions(certGrid);
-        enableTilt(certGrid);
+        if (!isMobile) enableTilt(certGrid);
 
         if (countBadge && countText) {
           countText.textContent = `${certs.length} ${certs.length === 1 ? 'cert' : 'certs'} earned`;
