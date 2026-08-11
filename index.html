@@ -131,7 +131,7 @@ radial-gradient(600px 500px at 50% 100%,rgba(30,255,160,.07),transparent 65%)}
 #scroll-progress-bar{width:100%;height:0%;background:linear-gradient(180deg,var(--green),var(--aqua));box-shadow:0 0 8px var(--green);transition:height .08s linear;position:relative;overflow:visible;border-radius:2px}
 #scroll-progress-bar:after{content:"";position:absolute;left:50%;top:0;transform:translate(-50%,-50%);width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 10px var(--aqua),0 0 4px #fff;animation:packetTravel 1.5s linear infinite}
 @keyframes packetTravel{0%{top:0%;opacity:0}8%{opacity:1}92%{opacity:1}100%{top:100%;opacity:0}}
-.scroll-node{position:absolute;left:50%;width:9px;height:9px;border-radius:50%;transform:translate(-50%,-50%);background:rgba(10,20,17,.9);border:1px solid rgba(120,255,210,.3);transition:background .35s,box-shadow .35s,border-color .35s;z-index:3}
+.scroll-node{position:absolute;left:50%;width:9px;height:9px;border-radius:50%;transform:translate(-50%,-50%);background:rgba(10,20,17,.9);border:1px solid rgba(120,255,210,.3);transition:background .35s,box-shadow .35s,border-color .35s;z-index:3;pointer-events:auto;cursor:pointer}
 .scroll-node.active{background:var(--green);border-color:var(--green);box-shadow:0 0 9px var(--green),0 0 2px #fff}
 #scroll-progress-pct{font-family:ui-monospace,monospace;font-size:.62rem;font-weight:700;letter-spacing:.06em;color:var(--green);margin-bottom:8px;writing-mode:vertical-rl;text-orientation:mixed}
 @media(max-width:640px){#scroll-progress-wrap{width:20px}#scroll-progress-label{display:none}}
@@ -554,11 +554,7 @@ footer{padding:35px 0 60px;color:#71857d;font-size:.78rem;display:flex;justify-c
   <span id="scroll-progress-label">LINK</span>
   <div id="scroll-progress-track">
     <div id="scroll-progress-bar"></div>
-    <div class="scroll-node" data-at="0" style="top:0%"></div>
-    <div class="scroll-node" data-at="25" style="top:25%"></div>
-    <div class="scroll-node" data-at="50" style="top:50%"></div>
-    <div class="scroll-node" data-at="75" style="top:75%"></div>
-    <div class="scroll-node" data-at="100" style="top:100%"></div>
+    <!-- .scroll-node elements are generated at runtime from real section positions (#about, #skills, #work, #tools, #activity, #contact) — see updateScrollProgress() -->
   </div>
   <span id="scroll-progress-pct">0%</span>
 </div>
@@ -608,7 +604,7 @@ footer{padding:35px 0 60px;color:#71857d;font-size:.78rem;display:flex;justify-c
       <a class="btn primary" href="#work">Explore my work ↗</a>
       <a class="btn" href="#contact">Let's connect</a>
       <a class="btn" href="#" id="cvDownloadBtn">Download CV 📄</a>
-      <button class="btn" id="shareBtn" style="display:none">Share 📤</button>
+      <button class="btn" id="shareBtn" style="display:none">Share <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-left:2px"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg></button>
     </div>
     
     <!-- 3D GLASS HERO CARD STAGE WITH TERMINAL INTERACTION -->
@@ -1456,10 +1452,37 @@ if (contactForm) {
   });
 }
 
-// SCROLL PROGRESS BAR
+// SCROLL PROGRESS BAR — dots align to real sections (#about #skills #work #tools #activity #contact)
 const scrollBar = document.getElementById('scroll-progress-bar');
 const scrollPct = document.getElementById('scroll-progress-pct');
-const scrollNodes = document.querySelectorAll('.scroll-node');
+const scrollTrack = document.getElementById('scroll-progress-track');
+const trackedSectionIds = ['about', 'skills', 'work', 'tools', 'activity', 'contact'];
+let scrollNodes = [];
+
+function buildScrollNodes() {
+  if (!scrollTrack) return;
+  scrollTrack.querySelectorAll('.scroll-node').forEach(n => n.remove());
+  const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  if (docHeight <= 0) return;
+
+  trackedSectionIds.forEach(id => {
+    const section = document.getElementById(id);
+    if (!section) return;
+    const pct = Math.min(100, Math.max(0, (section.offsetTop / docHeight) * 100));
+    const node = document.createElement('div');
+    node.className = 'scroll-node';
+    node.dataset.at = pct.toFixed(2);
+    node.dataset.section = id;
+    node.style.top = pct + '%';
+    node.title = id.charAt(0).toUpperCase() + id.slice(1);
+    node.addEventListener('click', () => {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    scrollTrack.appendChild(node);
+  });
+  scrollNodes = scrollTrack.querySelectorAll('.scroll-node');
+}
+
 function updateScrollProgress() {
   const scrollTop = window.scrollY || document.documentElement.scrollTop;
   const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
@@ -1472,8 +1495,10 @@ function updateScrollProgress() {
     n.classList.toggle('active', shouldBeActive);
   });
 }
+
+buildScrollNodes();
 addEventListener('scroll', updateScrollProgress, { passive: true });
-addEventListener('resize', updateScrollProgress);
+addEventListener('resize', () => { buildScrollNodes(); updateScrollProgress(); });
 updateScrollProgress();
 
 // OPTIMIZED REVEALS & BLOBS
