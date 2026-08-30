@@ -173,6 +173,13 @@ h1{font-size:clamp(4.4rem,13vw,10rem);line-height:.8;letter-spacing:-.09em;margi
 
 .hero-copy{max-width:650px;margin:auto;color:var(--muted);font-size:clamp(1rem,2vw,1.18rem);line-height:1.75}
 .actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:30px}.btn{display:inline-flex;align-items:center;gap:9px;padding:13px 18px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.055);backdrop-filter:blur(18px);transition:.35s var(--ease); cursor:pointer;}.btn:hover{transform:translateY(-3px) scale(1.02);background:rgba(255,255,255,.1);box-shadow:0 20px 50px rgba(70,255,175,.1)}.btn.primary{background:linear-gradient(100deg,#73ffb5,#c1ffe0);color:#00140b;border:0;font-weight:700}
+.btn{position:relative;overflow:hidden;isolation:isolate;will-change:transform,box-shadow}
+.btn:before{content:'';position:absolute;inset:-2px;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.22),transparent 34%);opacity:0;transition:opacity .28s ease;pointer-events:none;z-index:-1}
+.btn:after{content:'';position:absolute;top:-120%;left:-35%;width:35%;height:340%;transform:rotate(18deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent);opacity:0;pointer-events:none;transition:transform .7s cubic-bezier(.2,.7,.2,1),opacity .25s ease}
+.btn:hover:before{opacity:1}
+.btn:hover:after{opacity:1;transform:translateX(420%) rotate(18deg)}
+.btn:active{transform:translateY(0) scale(.985)!important}
+.btn.primary:hover{box-shadow:0 18px 60px rgba(100,255,173,.24),inset 0 1px 0 rgba(255,255,255,.45)}
 .glass{border:1px solid var(--line);background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.025));backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);box-shadow:var(--shadow),inset 0 1px rgba(255,255,255,.09)}
 
 /* 3D GLASS HERO CARD STAGE & TERMINAL */
@@ -226,6 +233,18 @@ h1{font-size:clamp(4.4rem,13vw,10rem);line-height:.8;letter-spacing:-.09em;margi
 }
 .terminal-overlay.active {
   opacity: 1; visibility: visible; pointer-events: auto;
+}
+/* The terminal is revealed at the end of the particle-camera dive. */
+.terminal-overlay.terminal-dive-in {
+  animation: terminalDiveIn .72s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes terminalDiveIn {
+  0% { opacity:0; transform:scale(1.08); filter:blur(16px); }
+  55% { opacity:1; transform:scale(1.015); filter:blur(1px); }
+  100% { opacity:1; transform:scale(1); filter:blur(0); }
+}
+.network-stage.particle-dive #webgl-canvas {
+  filter:contrast(1.08) saturate(1.08);
 }
 .terminal-output {
   white-space: pre-wrap; flex-grow: 1;
@@ -523,6 +542,75 @@ footer{padding:35px 0 60px;color:#71857d;font-size:.78rem;display:flex;justify-c
   section{padding:85px 0}
   footer{display:block;line-height:2}
 }
+
+/* ==========================================================
+   HYPER REALISM / CINEMATIC EXPERIENCE LAYER
+   Visual-only enhancement: preserves existing markup/features.
+   ========================================================== */
+:root{
+  --hyper-glow: rgba(100,255,173,.32);
+  --hyper-aura: rgba(103,247,255,.22);
+  --hyper-white: rgba(245,255,249,.92);
+}
+body{background:
+  radial-gradient(1200px 780px at 50% -10%,rgba(100,255,173,.08),transparent 58%),
+  radial-gradient(900px 650px at 100% 40%,rgba(103,247,255,.055),transparent 62%),
+  #020403;
+}
+body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:49;opacity:.16;
+  background:linear-gradient(120deg,transparent 0 44%,rgba(255,255,255,.018) 48%,transparent 52%),
+             repeating-linear-gradient(180deg,rgba(255,255,255,.012) 0 1px,transparent 1px 7px);
+  mix-blend-mode:screen;
+}
+#globalCanvas{position:fixed;inset:0;z-index:-2;width:100%;height:100%;display:block;pointer-events:none;opacity:1;filter:saturate(.78) contrast(1.04) brightness(.88)}
+.hyper-vignette{position:fixed;inset:-5%;z-index:-1;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 42%,transparent 28%,rgba(0,0,0,.10) 60%,rgba(0,0,0,.66) 100%),linear-gradient(180deg,rgba(220,255,249,.035),transparent 28%,rgba(0,0,0,.18) 100%);
+  mix-blend-mode:multiply;
+}
+.hero{isolation:isolate;overflow:clip}
+.hero:before{content:"";position:absolute;inset:0;z-index:-1;
+  background:radial-gradient(700px 400px at 50% 46%,rgba(225,255,249,.065),transparent 70%);
+}
+.hero .wrap{position:relative}
+.hero h1{position:relative;text-shadow:0 0 70px rgba(100,255,173,.06)}
+.hero h1:after{content:"";position:absolute;left:50%;top:50%;width:min(64vw,620px);height:min(64vw,620px);transform:translate(-50%,-50%);z-index:-1;border-radius:50%;
+  border:1px solid rgba(235,255,250,.035);box-shadow:0 0 120px rgba(215,255,247,.045),inset 0 0 90px rgba(215,255,247,.02)}
+.network-stage{transform-style:preserve-3d;box-shadow:0 55px 140px rgba(0,0,0,.68),0 0 70px rgba(215,255,247,.035),inset 0 1px rgba(255,255,255,.14)}
+.network-stage:before{background:
+  linear-gradient(105deg,rgba(0,0,0,.78) 0%,rgba(0,0,0,.08) 42%,rgba(0,0,0,.3) 100%),
+  radial-gradient(500px 280px at 70% 24%,rgba(225,255,249,.075),transparent 72%)}
+.network-stage:after{box-shadow:inset 0 0 100px rgba(60,255,180,.07),0 0 0 1px rgba(255,255,255,.025)}
+.stage-hud,.stage-caption{filter:drop-shadow(0 5px 14px rgba(0,0,0,.6))}
+section{position:relative}
+section:before{content:"";position:absolute;left:0;right:0;top:0;height:1px;opacity:.35;
+  background:linear-gradient(90deg,transparent,rgba(120,255,210,.16),transparent)}
+.head h2{position:relative}
+.head h2:after{content:"";display:block;width:72px;height:1px;margin-top:18px;background:linear-gradient(90deg,var(--green),transparent);opacity:.65}
+.glass{position:relative;overflow:hidden}
+.glass:before{content:"";position:absolute;inset:-1px;pointer-events:none;border-radius:inherit;
+ background:linear-gradient(120deg,rgba(255,255,255,.08),transparent 25%,transparent 68%,rgba(103,247,255,.035));opacity:.7}
+.glass:after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+ background:radial-gradient(240px 110px at var(--spot-x,50%) var(--spot-y,20%),rgba(255,255,255,.055),transparent 70%);opacity:0;transition:opacity .3s ease}
+.glass.spot-active:after{opacity:1}
+.project{min-height:430px;transform-style:preserve-3d}
+.project>*{position:relative;z-index:1}
+.project h3{transform:translateZ(26px)}
+.project .meta,.project p,.project .bottom{transform:translateZ(14px)}
+.project:before{filter:saturate(1.25)}
+.project:after{border-color:rgba(120,255,210,.16);box-shadow:inset 0 0 110px rgba(90,255,195,.09),0 0 35px rgba(100,255,173,.045)}
+.stat,.cert-inner,.osi-tool,.subnet-tool,.gh-feed,.contact{transform-style:preserve-3d}
+.stat strong{transform:translateZ(18px);display:block}
+.tags .tag{box-shadow:inset 0 1px rgba(255,255,255,.05),0 6px 20px rgba(0,0,0,.12)}
+.contact{box-shadow:0 50px 130px rgba(0,0,0,.6),inset 0 1px rgba(255,255,255,.14)}
+.contact:after{content:"";position:absolute;inset:auto -15% -60% 35%;height:380px;border-radius:50%;border:1px solid rgba(120,255,210,.08);box-shadow:0 0 70px rgba(100,255,173,.05)}
+.reveal{filter:blur(6px);transition:opacity .9s var(--ease),transform .9s var(--ease),filter .9s var(--ease)}
+.reveal.show{filter:none}
+@media(max-width:760px){
+  #globalCanvas{opacity:.68}
+  .hero h1:after{width:92vw;height:92vw}
+}
+@media (prefers-reduced-motion:reduce){#globalCanvas,.hyper-vignette{display:none}}
+
 </style>
 </head>
 <body>
@@ -559,7 +647,7 @@ footer{padding:35px 0 60px;color:#71857d;font-size:.78rem;display:flex;justify-c
   <span id="scroll-progress-pct">0%</span>
 </div>
 
-<div class="ambient"><div class="blob a"></div><div class="blob b"></div></div>
+<canvas id="globalCanvas" aria-hidden="true"></canvas><div class="hyper-vignette"></div><div class="ambient"><div class="blob a"></div><div class="blob b"></div></div>
 <div class="cursor"></div><div class="dot"></div>
 
 <nav>
@@ -935,16 +1023,36 @@ const closeTerm = document.getElementById('closeTerm');
 let cmdHistory = [];
 let historyIndex = -1;
 
+let terminalDiveTimer = null;
 stage.addEventListener('click', (e) => {
   if (!e.target.closest('.terminal-overlay') && e.target !== closeTerm && e.target !== termInput) {
-    termOverlay.classList.add('active');
-    termInput.focus();
-    sfx.duck(true);
+    // First click: travel through the particle Earth. The terminal appears
+    // only after the camera has entered the object, preserving the existing
+    // terminal functionality while making it feel like a hidden system.
+    if (terminalDiveTimer) return;
+    const hero=window.__realisticNetworkHero;
+    if(hero && hero.startParticleDive){
+      hero.startParticleDive();
+      sfx.duck(true);
+      terminalDiveTimer=setTimeout(()=>{
+        terminalDiveTimer=null;
+        termOverlay.classList.add('active');
+        termOverlay.classList.add('terminal-dive-in');
+        termInput.focus();
+      }, 980);
+    } else {
+      termOverlay.classList.add('active');
+      termInput.focus();
+      sfx.duck(true);
+    }
   }
 });
 closeTerm.addEventListener('click', (e) => {
   e.stopPropagation();
+  termOverlay.classList.remove('terminal-dive-in');
   termOverlay.classList.remove('active');
+  const hero=window.__realisticNetworkHero;
+  if(hero && hero.resetParticleDive) hero.resetParticleDive();
   sfx.duck(false);
 });
 
@@ -978,6 +1086,8 @@ termInput.addEventListener('keydown', (e) => {
     } else if (val === 'whoami') {
         termOutput.innerHTML += `\nSasindu Roshan — 20, Sri Lanka. A/L Maths student building toward network engineering. Exploring Linux, subnetting, VLANs and web dev along the way.`;
         termOverlay.classList.remove('active');
+        termOverlay.classList.remove('terminal-dive-in');
+        if(window.__realisticNetworkHero?.resetParticleDive) window.__realisticNetworkHero.resetParticleDive();
         sfx.duck(false);
         revealAboutPhoto();
     } else if (val === 'sudo rm -rf /') {
@@ -991,6 +1101,8 @@ termInput.addEventListener('keydown', (e) => {
         runMatrixRain(4000);
     } else if (val === 'exit') {
         termOverlay.classList.remove('active');
+        termOverlay.classList.remove('terminal-dive-in');
+        if(window.__realisticNetworkHero?.resetParticleDive) window.__realisticNetworkHero.resetParticleDive();
         sfx.duck(false);
     } else if (val === 'clear') {
         termOutput.innerHTML = '';
@@ -1312,7 +1424,35 @@ class SandPouringAudio {
       this.sandGain.gain.setTargetAtTime(0,now,0.12);
     },90);
   }
-  playHover(){this._tone({freq:420,freqTo:560,dur:.11,gain:.006})} playTextScramble(){this._tone({freq:280+Math.random()*120,dur:.02,gain:.004})} playKeystroke(){this._click({dur:.014,gain:.01,freq:3200})} playConfirm(){this._tone({freq:520,freqTo:760,dur:.14,gain:.01})} playError(){this._tone({freq:190,freqTo:120,dur:.15,gain:.012})} playPaletteOpen(){this._tone({freq:280,freqTo:620,dur:.18,gain:.009})} playPaletteClose(){this._tone({freq:620,freqTo:240,dur:.14,gain:.008})} playTick(){this._click({dur:.01,gain:.007,freq:3900})} playChime(){this._tone({freq:660,dur:.14,gain:.012});this._tone({freq:880,dur:.2,gain:.01,delay:.07})} playThud(){this._tone({freq:130,freqTo:78,dur:.22,gain:.016})} playModalOpen(){this._tone({freq:220,freqTo:430,dur:.22,gain:.009})} playModalClose(){this._tone({freq:430,freqTo:180,dur:.16,gain:.008})} playPacketBlip(step,total=7){this._tone({freq:360+(step/total)*540,dur:.055,gain:.007})} playClick(){this._click({dur:.018,gain:.01,freq:2800})} playFormSuccess(){this._tone({freq:523.25,dur:.14,gain:.012});this._tone({freq:659.25,dur:.15,gain:.01,delay:.09});this._tone({freq:783.99,dur:.22,gain:.01,delay:.18})} playFormError(){this._tone({freq:200,freqTo:100,dur:.24,gain:.012})}
+  playParticleMove(intensity=0.2){
+    if(!this.enabled)return; this.init();
+    const now=performance.now();
+    if(this._lastParticleSound && now-this._lastParticleSound<42)return;
+    this._lastParticleSound=now;
+    const i=Math.max(.05,Math.min(1.6,intensity));
+    this._tone({type:'triangle',freq:180+i*120,freqTo:420+i*260,dur:.09,gain:.0018+i*.0018});
+  }
+  playParticleDive(){
+    if(!this.enabled)return; this.init();
+    this.duck(true);
+    this._tone({type:'sine',freq:90,freqTo:34,dur:.9,gain:.035});
+    this._tone({type:'triangle',freq:240,freqTo:72,dur:.65,gain:.018,delay:.05});
+    this._tone({type:'sine',freq:1200,freqTo:180,dur:.55,gain:.008,delay:.1});
+    setTimeout(()=>this.duck(false),850);
+  }
+  playParticleRelease(){
+    if(!this.enabled)return; this.init();
+    this._tone({type:'sine',freq:160,freqTo:480,dur:.38,gain:.012});
+    this._tone({type:'triangle',freq:480,freqTo:760,dur:.28,gain:.006,delay:.08});
+  }
+  playHover(){
+    if(!this.enabled)return; this.init();
+    const now=this.ctx.currentTime;
+    if(this._lastHoverSound && now-this._lastHoverSound<0.045)return;
+    this._lastHoverSound=now;
+    this._tone({type:'sine',freq:360,freqTo:620,dur:.10,gain:.0045});
+    this._tone({type:'triangle',freq:980,freqTo:1450,dur:.055,gain:.0022,delay:.018});
+  } playTextScramble(){this._tone({freq:280+Math.random()*120,dur:.02,gain:.004})} playKeystroke(){this._click({dur:.014,gain:.01,freq:3200})} playConfirm(){this._tone({freq:520,freqTo:760,dur:.14,gain:.01})} playError(){this._tone({freq:190,freqTo:120,dur:.15,gain:.012})} playPaletteOpen(){this._tone({freq:280,freqTo:620,dur:.18,gain:.009})} playPaletteClose(){this._tone({freq:620,freqTo:240,dur:.14,gain:.008})} playTick(){this._click({dur:.01,gain:.007,freq:3900})} playChime(){this._tone({freq:660,dur:.14,gain:.012});this._tone({freq:880,dur:.2,gain:.01,delay:.07})} playThud(){this._tone({freq:130,freqTo:78,dur:.22,gain:.016})} playModalOpen(){this._tone({freq:220,freqTo:430,dur:.22,gain:.009})} playModalClose(){this._tone({freq:430,freqTo:180,dur:.16,gain:.008})} playPacketBlip(step,total=7){this._tone({freq:360+(step/total)*540,dur:.055,gain:.007})} playClick(){this._click({dur:.018,gain:.01,freq:2800})} playFormSuccess(){this._tone({freq:523.25,dur:.14,gain:.012});this._tone({freq:659.25,dur:.15,gain:.01,delay:.09});this._tone({freq:783.99,dur:.22,gain:.01,delay:.18})} playFormError(){this._tone({freq:200,freqTo:100,dur:.24,gain:.012})}
   playGlitch(){
     if(!this.enabled)return;this.init();
     const t0=this.ctx.currentTime;
@@ -1340,6 +1480,7 @@ class SandPouringAudio {
 }
 
 const sfx = new SandPouringAudio();
+window.sfx = sfx;
 const soundToggle = document.getElementById('soundToggle');
 const volumeSlider = document.getElementById('volumeSlider');
 
@@ -1510,203 +1651,364 @@ const io = new IntersectionObserver(es => es.forEach(e => {
 }), { threshold: 0.05, rootMargin: "0px 0px -50px 0px" });
 document.querySelectorAll('.reveal').forEach(x => io.observe(x));
 const blobs=document.querySelectorAll('.blob');
-addEventListener('pointermove',e=>{const x=(e.clientX/innerWidth-.5)*35,y=(e.clientY/innerHeight-.5)*35;blobs[0].style.transform=`translate(${x}px,${y}px)`;blobs[1].style.transform=`translate(${-x}px,${-y}px)`});
+if(!isMobile){ addEventListener('pointermove',e=>{const x=(e.clientX/innerWidth-.5)*35,y=(e.clientY/innerHeight-.5)*35;blobs[0].style.transform=`translate(${x}px,${y}px)`;blobs[1].style.transform=`translate(${-x}px,${-y}px)`}); }
 
-// THREE.JS WEBGL PARTICLE NETWORK
+// THREE.JS HERO — IGLOO-STYLE VOLUMETRIC NETWORK OBJECT
+// Dense particles form a real 3D network globe/core. The silhouette is soft,
+// matte and volumetric rather than a neon wireframe. Pointer forces disturb
+// the volume and it continuously reforms; scroll subtly changes the pose.
 const container = document.getElementById('webgl-canvas');
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-if(container && typeof THREE !== 'undefined' && !prefersReducedMotion && !isMobile) {
+if(container && typeof THREE !== 'undefined' && !prefersReducedMotion) {
+  const mobileHero = window.matchMedia('(pointer:coarse)').matches;
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-  camera.position.z = 15;
+  scene.fog = new THREE.FogExp2(0x071116, 0.075);
+  const camera = new THREE.PerspectiveCamera(30, container.clientWidth / container.clientHeight, 0.05, 80);
+  camera.position.set(0, 0.10, 8.8);
 
-  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-  renderer.setSize(container.clientWidth, container.clientHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  container.appendChild(renderer.domElement);
+  const renderer = new THREE.WebGLRenderer({alpha:true, antialias:!mobileHero, powerPreference:'high-performance'});
+  renderer.setSize(container.clientWidth, container.clientHeight, false);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobileHero ? 1 : 1.65));
+  renderer.outputColorSpace = THREE.SRGBColorSpace || THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.0;
+  container.innerHTML=''; container.appendChild(renderer.domElement);
 
-  const particleGroup = new THREE.Group();
-  scene.add(particleGroup);
+  const ambient = new THREE.HemisphereLight(0xbad5dc, 0x020608, .72); scene.add(ambient);
+  const key = new THREE.DirectionalLight(0xe9f7f7, 2.2); key.position.set(-4, 6, 6); scene.add(key);
+  const fill = new THREE.PointLight(0x7cecff, 3.2, 14, 2); fill.position.set(-3.2, 1.5, 4); scene.add(fill);
+  const rim = new THREE.PointLight(0x64ffad, 2.4, 13, 2); rim.position.set(3.4, -1.2, 2.2); scene.add(rim);
 
-  const particleCount = 1100;
-  const positions = new Float32Array(particleCount * 3);
-  const basePositions = new Float32Array(particleCount * 3);
-  const velocities = new Float32Array(particleCount * 3);
-  const colors = new Float32Array(particleCount * 3);
+  const root = new THREE.Group(); root.position.y = .05; scene.add(root);
+  const particleCount = mobileHero ? 4200 : 24000;
+  const positions = new Float32Array(particleCount*3);
+  const base = new Float32Array(particleCount*3);
+  const phase = new Float32Array(particleCount);
+  const sizes = new Float32Array(particleCount);
+  const seed = new Float32Array(particleCount);
 
-  const hub = { x: 0, y: 0 };
-  const satellites = [];
-  const satCount = 6;
-  for (let i = 0; i < satCount; i++) {
-    const angle = (i / satCount) * Math.PI * 2;
-    satellites.push({ x: Math.cos(angle) * 5.4, y: Math.sin(angle) * 3.1 });
+  // Build a planet-scale network object: a dense spherical Earth made from
+  // larger volumetric particles. Landmasses are generated procedurally from
+  // layered spherical noise so the globe reads as a physical world rather
+  // than a generic particle ball. The network layer turns it into a visual
+  // metaphor for connected systems.
+  function hash3(x,y,z){
+    return (Math.sin(x*127.1+y*311.7+z*74.7)*43758.5453)%1;
+  }
+  function smoothNoise(x,y,z){
+    const a=Math.sin(x*1.7+y*2.3+z*2.9);
+    const b=Math.sin(x*3.9-y*1.3+z*4.7);
+    const c=Math.sin(x*7.1+y*5.2-z*3.3);
+    const d=Math.sin(x*11.7-y*8.1+z*6.9);
+    return (a*.46+b*.28+c*.17+d*.09);
+  }
+  function continentMask(x,y,z){
+    // Several warped spherical noise layers create broad continent-sized
+    // masses with coast-like edges and smaller geographic detail.
+    const n1=smoothNoise(x*.82,y*.82,z*.82);
+    const n2=smoothNoise(x*1.65+4.2,y*1.65-1.1,z*1.65+2.7);
+    const n3=smoothNoise(x*3.4-2.4,y*3.4+3.1,z*3.4-4.8);
+    return n1*.66+n2*.25+n3*.09;
+  }
+  function sampleEarth(){
+    // Fibonacci sphere gives an even distribution, then we preferentially
+    // keep more points over land so continents become visibly denser.
+    const i=Math.floor(Math.random()*1000000);
+    const t=(i+Math.random())/1000000;
+    const y=1-2*t;
+    const rr=Math.sqrt(Math.max(0,1-y*y));
+    const a=i*2.399963229728653 + Math.random()*.35;
+    let x=Math.cos(a)*rr, z=Math.sin(a)*rr;
+    const n=continentMask(x,y,z);
+    const land=n>.055;
+    if(!land && Math.random()<.42) return sampleEarth();
+    const coast=Math.max(0,1-Math.abs(n-.055)*13);
+    const landLift=land ? (.035+Math.max(0,n-.055)*.075) : 0;
+    const radius=2.18+landLift+(Math.random()-.5)*.035;
+    return {v:new THREE.Vector3(x*radius,y*radius*.99,z*radius),land};
+  }
+  for(let i=0;i<particleCount;i++){
+    const sample=sampleEarth();
+    const v=sample.v;
+    const j=i*3;
+    base[j]=positions[j]=v.x;
+    base[j+1]=positions[j+1]=v.y;
+    base[j+2]=positions[j+2]=v.z;
+    phase[i]=Math.random()*Math.PI*2;
+    // Encode land/ocean in the particle seed so the shader can render
+    // recognizable Earth colors instead of assigning random colors.
+    seed[i]=sample.land ? .72+Math.random()*.28 : Math.random()*.30;
+    // Bigger particles overlap slightly, producing the dense, tactile
+    // photographed-powder look of the reference rather than a star field.
+    sizes[i]=.78+Math.pow(Math.random(),.48)*1.55;
   }
 
-  function randomNetworkPoint() {
-    if (Math.random() < 0.32) {
-      const node = Math.random() < 0.25
-        ? hub
-        : satellites[Math.floor(Math.random() * satellites.length)];
-      const r = Math.random() * 0.45;
-      const a = Math.random() * Math.PI * 2;
-      return { x: node.x + Math.cos(a) * r, y: node.y + Math.sin(a) * r };
-    }
-    const sat = satellites[Math.floor(Math.random() * satellites.length)];
-    const t = Math.random();
-    const dx = sat.x - hub.x, dy = sat.y - hub.y;
-    const len = Math.hypot(dx, dy) || 1;
-    const nx = -dy / len, ny = dx / len;
-    const jitter = (Math.random() - 0.5) * 0.22;
-    return { x: hub.x + dx * t + nx * jitter, y: hub.y + dy * t + ny * jitter };
+  // Network connections are part of the particle volume, not a separate HUD.
+  const networkLinks=[];
+  const linkCount=mobileHero?1000:2100;
+  const linkPos=new Float32Array(linkCount*3);
+  const routeSeeds=[
+    [-.82,.18],[ -.42,.46],[.05,.34],[.48,.22],[.76,-.04],
+    [-.62,-.26],[-.18,-.42],[.25,-.31],[.57,-.5]
+  ];
+  for(let i=0;i<linkCount;i++){
+    const r=routeSeeds[(Math.random()*routeSeeds.length)|0];
+    const lon=r[0]*Math.PI, lat=r[1]*Math.PI;
+    const sweep=(Math.random()-.5)*.34;
+    const t=Math.random();
+    const lon2=lon+(Math.sin(i*1.73)*.42)+sweep;
+    const lat2=lat+(Math.cos(i*1.19)*.28);
+    const L=lon+(lon2-lon)*t;
+    const A=lat+(lat2-lat)*t;
+    const rr=2.205 + .035*Math.sin(t*Math.PI);
+    const j=i*3;
+    linkPos[j]=Math.cos(A)*Math.cos(L)*rr;
+    linkPos[j+1]=Math.sin(A)*rr;
+    linkPos[j+2]=Math.cos(A)*Math.sin(L)*rr;
   }
+  const linkGeo=new THREE.BufferGeometry(); linkGeo.setAttribute('position',new THREE.BufferAttribute(linkPos,3));
+  const linkMat=new THREE.PointsMaterial({color:0x86f6cf,size:mobileHero?.016:.021,transparent:true,opacity:.22,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true});
+  root.add(new THREE.Points(linkGeo,linkMat));
 
-  for (let filled = 0; filled < particleCount; filled++) {
-    const { x: rx, y: ry } = randomNetworkPoint();
-    const rz = (Math.random() - 0.5) * 2.5;
-
-    const idx = filled * 3;
-    positions[idx] = rx;
-    positions[idx + 1] = ry;
-    positions[idx + 2] = rz;
-
-    basePositions[idx] = rx;
-    basePositions[idx + 1] = ry;
-    basePositions[idx + 2] = rz;
-
-    velocities[idx] = 0;
-    velocities[idx + 1] = 0;
-    velocities[idx + 2] = 0;
-
-    colors[idx] = 0.38 + Math.random() * 0.1;
-    colors[idx + 1] = 0.98;
-    colors[idx + 2] = 0.7 + Math.random() * 0.3;
-  }
-
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-  const canvasMap = document.createElement('canvas');
-  canvasMap.width = 16;
-  canvasMap.height = 16;
-  const ctx = canvasMap.getContext('2d');
-  const grad = ctx.createRadialGradient(8, 8, 0, 8, 8, 8);
-  grad.addColorStop(0, 'rgba(255,255,255,1)');
-  grad.addColorStop(0.5, 'rgba(100,255,173,0.85)');
-  grad.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 16, 16);
-  const pTexture = new THREE.CanvasTexture(canvasMap);
-
-  const material = new THREE.PointsMaterial({
-    size: 0.16,
-    vertexColors: true,
-    map: pTexture,
-    transparent: true,
-    opacity: 0.88,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(positions,3));
+  geo.setAttribute('aSize',new THREE.BufferAttribute(sizes,1));
+  geo.setAttribute('aSeed',new THREE.BufferAttribute(seed,1));
+  const mat=new THREE.ShaderMaterial({
+    transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+    uniforms:{uTime:{value:0},uPixelRatio:{value:Math.min(devicePixelRatio||1,mobileHero?1:1.65)},uHover:{value:0},uScroll:{value:0}},
+    vertexShader:`
+      attribute float aSize; attribute float aSeed;
+      uniform float uTime; uniform float uPixelRatio; uniform float uHover; uniform float uScroll;
+      varying float vDepth; varying float vSeed;
+      void main(){
+        vec3 p=position;
+        float breath=sin(uTime*.75+aSeed*8.0)*.018 + sin(uTime*.27+p.y*2.0)*.012;
+        p += normalize(p+vec3(.001))*breath;
+        p.x += sin(uTime*.42+p.z*2.2+aSeed*7.0)*.012;
+        p.y += cos(uTime*.34+p.x*2.0+aSeed*5.0)*.010;
+        vec4 mv=modelViewMatrix*vec4(p,1.0);
+        gl_Position=projectionMatrix*mv;
+        float d=max(1.0,-mv.z);
+        gl_PointSize=aSize*uPixelRatio*(10.5/d);
+        vDepth=clamp((-mv.z-3.0)/8.0,0.0,1.0); vSeed=aSeed;
+      }
+    `,
+    fragmentShader:`
+      varying float vDepth; varying float vSeed;
+      void main(){
+        vec2 uv=gl_PointCoord-.5;
+        float r=length(uv);
+        if(r>.5) discard;
+        float nz=sqrt(max(0.0,1.0-r*r));
+        vec3 normal=normalize(vec3(uv.x,uv.y,nz));
+        vec3 lightDir=normalize(vec3(-.38,-.32,.88));
+        float diffuse=.38+.62*max(dot(normal,lightDir),0.0);
+        float rim=pow(1.0-max(normal.z,0.0),2.5);
+        float landMask=step(.70,vSeed);
+        vec3 ocean=vec3(.055,.24,.39);
+        vec3 oceanLit=vec3(.12,.48,.66);
+        vec3 land=vec3(.22,.46,.31);
+        vec3 landLit=vec3(.60,.73,.49);
+        vec3 c=landMask>0.5 ? mix(land,landLit,diffuse) : mix(ocean,oceanLit,diffuse);
+        // Polar particles are bright and slightly desaturated, hinting at ice.
+        float polar=smoothstep(.84,1.0,abs(normal.y));
+        c=mix(c,vec3(.80,.88,.88),polar*.72);
+        // A tiny cool specular glint gives the larger particles a spherical,
+        // lit appearance instead of flat 2D dots.
+        vec3 halfDir=normalize(lightDir+vec3(0.0,0.0,1.0));
+        float spec=pow(max(dot(normal,halfDir),0.0),38.0);
+        c+=vec3(.45,.78,.86)*spec*.32;
+        c=mix(c,vec3(.48,.78,.84),rim*.16);
+        float soft=1.0-smoothstep(.42,.5,r);
+        float alpha=(.70*soft+.30)*(1.0-vDepth*.16);
+        gl_FragColor=vec4(c,alpha);
+      }
+    `
   });
+  const particles=new THREE.Points(geo,mat); root.add(particles);
 
-  const pointCloud = new THREE.Points(geometry, material);
-  particleGroup.add(pointCloud);
+  // Soft atmospheric shell: a sparse ring of larger particles catches light
+  // around the globe and gives the sphere a physical, photographed edge.
+  const atmosphereCount=mobileHero?900:1800;
+  const atmospherePos=new Float32Array(atmosphereCount*3);
+  for(let i=0;i<atmosphereCount;i++){
+    const y=Math.random()*2-1, a=Math.random()*Math.PI*2, r=Math.sqrt(1-y*y);
+    const radius=2.26+Math.random()*.13, j=i*3;
+    atmospherePos[j]=Math.cos(a)*r*radius;
+    atmospherePos[j+1]=y*radius;
+    atmospherePos[j+2]=Math.sin(a)*r*radius;
+  }
+  const atmosphereGeo=new THREE.BufferGeometry(); atmosphereGeo.setAttribute('position',new THREE.BufferAttribute(atmospherePos,3));
+  const atmosphere=new THREE.Points(atmosphereGeo,new THREE.PointsMaterial({color:0x9ed8e6,size:mobileHero?.024:.036,transparent:true,opacity:.11,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true}));
+  root.add(atmosphere);
 
-  const mouseWorld = new THREE.Vector3(-999, -999, 0);
-  let lastMouseX = 0, lastMouseY = 0;
+  // Thin cloud layer: sparse white particles sit just above the surface and
+  // drift slowly, adding another depth cue to the Earth silhouette.
+  const cloudCount=mobileHero?700:1500;
+  const cloudPos=new Float32Array(cloudCount*3);
+  for(let i=0;i<cloudCount;i++){
+    const y=(Math.random()*2-1), a=Math.random()*Math.PI*2, r=Math.sqrt(1-y*y);
+    const band=Math.abs(Math.sin(a*2.1+y*5.0)+Math.sin(a*4.7-y*3.2))*.5;
+    const radius=2.235+band*.055, j=i*3;
+    cloudPos[j]=Math.cos(a)*r*radius;
+    cloudPos[j+1]=y*radius;
+    cloudPos[j+2]=Math.sin(a)*r*radius;
+  }
+  const cloudGeo=new THREE.BufferGeometry(); cloudGeo.setAttribute('position',new THREE.BufferAttribute(cloudPos,3));
+  const clouds=new THREE.Points(cloudGeo,new THREE.PointsMaterial({color:0xe5f1ee,size:mobileHero?.028:.043,transparent:true,opacity:.075,depthWrite:false,sizeAttenuation:true}));
+  root.add(clouds);
 
-  container.parentElement.addEventListener('mousemove', (e) => {
-    
-    const rect = container.getBoundingClientRect();
-    const mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    const mouseY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+  // A restrained halo of environmental dust makes the silhouette sit inside a real space.
+  const dustCount=mobileHero?900:1800;
+  const dustPos=new Float32Array(dustCount*3);
+  for(let i=0;i<dustCount;i++){
+    const j=i*3, a=Math.random()*Math.PI*2, r=2.8+Math.random()*4.8;
+    dustPos[j]=Math.cos(a)*r; dustPos[j+1]=(Math.random()-.5)*4.8; dustPos[j+2]=(Math.random()-.5)*3.2;
+  }
+  const dustGeo=new THREE.BufferGeometry(); dustGeo.setAttribute('position',new THREE.BufferAttribute(dustPos,3));
+  const dust=new THREE.Points(dustGeo,new THREE.PointsMaterial({color:0xb7d5d8,size:mobileHero?.018:.026,transparent:true,opacity:.12,depthWrite:false,sizeAttenuation:true})); root.add(dust);
 
-    const vector = new THREE.Vector3(mouseX, mouseY, 0.5);
-    vector.unproject(camera);
-    const dir = vector.sub(camera.position).normalize();
-    const distance = -camera.position.z / dir.z;
-    const pos = camera.position.clone().add(dir.multiplyScalar(distance));
-    
-    mouseWorld.copy(pos);
+  const pointer={x:0,y:0,tx:0,ty:0,px:0,py:0,velocity:0,localX:0,localY:0,localZ:2.15};
+  const pointerNdc=new THREE.Vector2();
+  const pointerRay=new THREE.Raycaster();
+  const pointerHit=new THREE.Vector3();
+  const pointerLocal=new THREE.Vector3();
+  let hover=0,time=0,visible=true,scrollProgress=0,targetScroll=0;
+  let lastPointerTime=performance.now();
+  let lastPointerX=0,lastPointerY=0;
 
-    const speed = Math.hypot(e.clientX - lastMouseX, e.clientY - lastMouseY);
-    lastMouseX = e.clientX;
-    lastMouseY = e.clientY;
-
-    if (speed > 0.8) {
-      const now = performance.now();
-      if (!window.__lastSandAudio || now - window.__lastSandAudio > 45) {
-        window.__lastSandAudio = now;
-        sfx.pourSand(speed / 2.5);
+  // Cinematic interaction state: the globe subtly follows the cursor, then
+  // a click can drive the camera through its particle field into the terminal.
+  let zoomIn=0, zoomTarget=0, zoomPulse=0;
+  const host=container.parentElement;
+  host.addEventListener('pointermove',e=>{
+    const r=host.getBoundingClientRect();
+    pointer.tx=(e.clientX-r.left)/r.width-.5;
+    pointer.ty=(e.clientY-r.top)/r.height-.5;
+    pointer.px=pointer.tx; pointer.py=pointer.ty;
+    pointerNdc.set(pointer.tx*2,-pointer.ty*2);
+    pointerRay.setFromCamera(pointerNdc,camera);
+    // Find the exact point where the cursor ray hits the particle globe, then
+    // convert that point into the globe's local coordinates. This makes the
+    // force follow the visible 3D surface instead of using a fake 2D offset.
+    const rayOrigin=camera.position.clone();
+    const rayDir=pointerRay.ray.direction.clone();
+    const center=root.getWorldPosition(new THREE.Vector3());
+    const oc=rayOrigin.clone().sub(center);
+    const b=oc.dot(rayDir), c=oc.dot(oc)-2.28*2.28;
+    const disc=b*b-c;
+    if(disc>0){
+      const hitT=-b-Math.sqrt(disc);
+      if(hitT>0){
+        pointerHit.copy(rayDir).multiplyScalar(hitT).add(rayOrigin);
+        pointerLocal.copy(pointerHit); root.worldToLocal(pointerLocal);
+        const pl=pointerLocal.length()||1;
+        pointer.localX=pointerLocal.x; pointer.localY=pointerLocal.y; pointer.localZ=pointerLocal.z;
       }
     }
-  });
-
-  container.parentElement.addEventListener('mouseleave', () => {
-    mouseWorld.set(-999, -999, 0);
-  });
-
-  let clock = 0;
-  let stageVisible = true;
-  const stageObserver = new IntersectionObserver((entries) => {
-    stageVisible = entries[0].isIntersecting;
-  }, { threshold: 0 });
-  stageObserver.observe(container.parentElement);
-
-  function animateWebGL() {
-    requestAnimationFrame(animateWebGL);
-    if (document.hidden || !stageVisible) return;
-    clock += 0.02;
-
-    const pos = geometry.attributes.position.array;
-
-    for (let i = 0; i < particleCount; i++) {
-      const idx = i * 3;
-      
-      const px = pos[idx];
-      const py = pos[idx + 1];
-      const pz = pos[idx + 2];
-
-      const bx = basePositions[idx];
-      const by = basePositions[idx + 1];
-      const bz = basePositions[idx + 2];
-
-      const dx = px - mouseWorld.x;
-      const dy = py - mouseWorld.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-
-      const forceRadius = 2.2;
-      if (dist < forceRadius) {
-        const force = (1 - dist / forceRadius) * 0.45;
-        velocities[idx] += (dx / dist) * force;
-        velocities[idx + 1] += (dy / dist) * force;
-        velocities[idx + 2] += (Math.random() - 0.5) * force;
-      }
-
-      velocities[idx] += (bx - px) * 0.05;
-      velocities[idx + 1] += (by - py) * 0.05;
-      velocities[idx + 2] += (bz - pz) * 0.05;
-
-      velocities[idx] *= 0.88;
-      velocities[idx + 1] *= 0.88;
-      velocities[idx + 2] *= 0.88;
-
-      pos[idx] += velocities[idx];
-      pos[idx + 1] += velocities[idx + 1];
-      pos[idx + 2] += velocities[idx + 2];
-    }
-
-    geometry.attributes.position.needsUpdate = true;
-    particleGroup.position.y = Math.sin(clock * 0.8) * 0.15;
-
-    renderer.render(scene, camera);
+    hover=1;
+    const now=performance.now(), dt=Math.max(8,now-lastPointerTime);
+    const dx=pointer.tx-lastPointerX, dy=pointer.ty-lastPointerY;
+    pointer.velocity=Math.min(2.5,Math.sqrt(dx*dx+dy*dy)/(dt/16.67)*12);
+    lastPointerX=pointer.tx; lastPointerY=pointer.ty; lastPointerTime=now;
+    if(pointer.velocity>.08 && sfx && sfx.enabled) sfx.playParticleMove(pointer.velocity);
+  },{passive:true});
+  host.addEventListener('pointerleave',()=>{pointer.tx=0;pointer.ty=0;hover=0;});
+  function startParticleDive(){
+    if(zoomTarget > .9 || zoomIn > .88) return;
+    zoomTarget=1; zoomPulse=1;
+    if(window.sfx && sfx.enabled) sfx.playParticleDive();
+    host.classList.add('particle-dive');
   }
-  animateWebGL();
+  function resetParticleDive(){
+    zoomTarget=0;
+    if(window.sfx && sfx.enabled) sfx.playParticleRelease();
+    host.classList.remove('particle-dive');
+  }
+  addEventListener('scroll',()=>{targetScroll=Math.max(0,Math.min(1,scrollY/(document.documentElement.scrollHeight-innerHeight||1)));},{passive:true});
+  const observer=new IntersectionObserver(es=>visible=es[0].isIntersecting,{threshold:0}); observer.observe(host);
 
-  window.addEventListener('resize', () => {
-    camera.aspect = container.clientWidth / container.clientHeight;
+  function resizeHero(){camera.aspect=container.clientWidth/container.clientHeight;camera.updateProjectionMatrix();renderer.setSize(container.clientWidth,container.clientHeight,false);}
+  addEventListener('resize',resizeHero,{passive:true}); resizeHero();
+
+  let heroFrame=0;
+  function animateHero(){
+    requestAnimationFrame(animateHero);
+    if(document.hidden||!visible)return;
+    if(mobileHero && (++heroFrame%2)) return;
+    time+=.006; pointer.x+=(pointer.tx-pointer.x)*.055; pointer.y+=(pointer.ty-pointer.y)*.055; hover+=(Math.max(0,hover)-hover)*.035; scrollProgress+=(targetScroll-scrollProgress)*.025;
+    zoomIn+=(zoomTarget-zoomIn)*.055; zoomPulse*=.93;
+    mat.uniforms.uTime.value=time; mat.uniforms.uHover.value=hover; mat.uniforms.uScroll.value=scrollProgress;
+
+    const diveEase=zoomIn*zoomIn*(3-2*zoomIn);
+    camera.position.x=pointer.x*.68+Math.sin(time*.13)*.035;
+    camera.position.y=-pointer.y*.34+Math.sin(time*.19)*.025;
+    camera.position.z=(8.35+Math.sin(time*.11)*.07) - diveEase*6.15;
+    camera.fov=30 + diveEase*11;
     camera.updateProjectionMatrix();
-    renderer.setSize(container.clientWidth, container.clientHeight);
-  });
+    camera.lookAt(pointer.x*.08,-.02,0);
+
+    root.rotation.y += .0022 + pointer.x*.0018 + diveEase*.006;
+    root.rotation.x += (-pointer.y*.045-root.rotation.x)*.018;
+    root.rotation.z = Math.sin(time*.12)*.012;
+    root.position.y=.04+Math.sin(time*.42)*.025;
+    root.scale.setScalar(1.04+Math.sin(scrollProgress*Math.PI)*.045);
+    dust.rotation.y=-time*.012;
+    atmosphere.rotation.y=time*.003;
+    clouds.rotation.y=time*.0045;
+
+    const pos=geo.attributes.position.array;
+    // Physical 3D cursor force: the mouse ray hits the globe, and nearby
+    // particles are displaced around that exact surface point. The radius is
+    // intentionally large enough to make the movement obvious.
+    const cursorX=pointer.localX, cursorY=pointer.localY, cursorZ=pointer.localZ;
+    const forceRadius=1.28 + hover*.42;
+    const forceStrength=1.12 + Math.min(2.2,pointer.velocity)*.42;
+    for(let i=0;i<particleCount;i++){
+      const j=i*3; let x=base[j],y=base[j+1],z=base[j+2];
+      const dx=x-cursorX,dy=y-cursorY,dz=z-cursorZ;
+      const dist=Math.sqrt(dx*dx+dy*dy+dz*dz)+.001;
+      if(dist<forceRadius){
+        const f=Math.pow(1-dist/forceRadius,2);
+        const falloff=f*(.72+hover*.62)*forceStrength;
+        x+=dx/dist*falloff; y+=dy/dist*falloff; z+=dz/dist*(falloff*.86);
+        // Add a tiny tangential flow so the field feels like particles being
+        // displaced through air rather than simply scaled away from a point.
+        const swirl=f*.12*(pointer.x*dy-pointer.y*dx);
+        x+=(-dy)*swirl; y+=dx*swirl;
+      }
+      // A softer volumetric wake follows the cursor's local position. This
+      // gives the rear layer a delayed reaction, making the globe feel alive
+      // instead of behaving like a flat interactive image.
+      const bx=x-cursorX*.72, by=y-cursorY*.72, bz=z-cursorZ*.35;
+      const wakeDist=Math.sqrt(bx*bx+by*by+bz*bz)+.001;
+      if(wakeDist<2.05){
+        const wf=Math.pow(1-wakeDist/2.05,2)*.18*hover;
+        x+=(-cursorX)*wf; y+=(-cursorY)*wf; z+=(-cursorZ)*wf*.45;
+      }
+      // During the dive, particles accelerate toward the camera and peel
+      // outward, creating the sensation of physically passing through the globe.
+      if(diveEase>0.001){
+        const len=Math.sqrt(x*x+y*y+z*z)+.001;
+        const spread=diveEase*(.55 + (i%7)/7*.55);
+        x += (x/len)*spread + pointer.x*diveEase*.38;
+        y += (y/len)*spread - pointer.y*diveEase*.30;
+        z += diveEase*(1.8 + (seed[i]-.5)*2.0);
+      }
+      const wave=Math.sin(time*.95+phase[i])*0.012;
+      x+=wave*(.35+seed[i]); y+=Math.cos(time*.72+phase[i]*1.7)*.009; z+=Math.sin(time*.6+phase[i])*0.011;
+      // Scroll gently changes the object's pose, as if the camera is passing a physical sculpture.
+      x+=Math.sin(scrollProgress*Math.PI*2)*.08*(1-seed[i]);
+      pos[j]+=(x-pos[j])*.085; pos[j+1]+=(y-pos[j+1])*.085; pos[j+2]+=(z-pos[j+2])*.085;
+    }
+    geo.attributes.position.needsUpdate=true;
+    fill.position.x=-3.2+Math.sin(time*.27)*.55; rim.position.x=3.4+Math.cos(time*.22)*.65;
+    fill.intensity=3.0+Math.sin(time*1.1)*.45; rim.intensity=2.3+Math.cos(time*1.2)*.35;
+    renderer.render(scene,camera);
+  }
+  animateHero();
+  window.__realisticNetworkHero={scene,camera,renderer,particles,root,startParticleDive,resetParticleDive,get zoomIn(){return zoomIn;}};
 }
 
 // 3D TILT & GLOW INTERACTION — now handled by enableTilt() after certs.json loads (see loadCertsAndSkills)
@@ -2066,6 +2368,245 @@ function enableTilt(root) {
     const infoHtml = `<h4>${d.label}</h4>` + 
       Object.entries(d.info).map(([k, v]) => `<span class="k">${k}:</span> ${v}<br>`).join('');
     panel.innerHTML = infoHtml;
+  });
+})();
+// ==========================================================
+// ==========================================================
+// AAA NETWORK WORLD — scroll-driven PBR environment
+// Built around Sasindu's actual identity: networking, systems,
+// servers, fiber, telemetry and connected infrastructure.
+// Existing portfolio feature logic is untouched.
+// ==========================================================
+(function initHyperRealScene(){
+  const canvas=document.getElementById('globalCanvas');
+  if(!canvas || !window.THREE) return;
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce) return;
+  const mobile=matchMedia('(pointer:coarse)').matches;
+
+  const scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x020305);
+  scene.fog=new THREE.Fog(0x05080b,10,58);
+
+  const camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.05,110);
+  camera.position.set(0,2.5,12);
+
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:!mobile,alpha:false,powerPreference:'high-performance'});
+  renderer.setPixelRatio(Math.min(devicePixelRatio||1,mobile?.85:1.85));
+  renderer.setSize(innerWidth,innerHeight,false);
+  renderer.outputColorSpace=THREE.SRGBColorSpace||THREE.sRGBEncoding;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.05;
+  renderer.shadowMap.enabled=!mobile;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+
+  // --- Cinematic lighting rig ---
+  const ambient=new THREE.HemisphereLight(0x91a6b8,0x020306,.55); scene.add(ambient);
+  const key=new THREE.DirectionalLight(0xddeeff,3.2); key.position.set(-7,11,7); key.castShadow=!mobile;
+  key.shadow.mapSize.set(mobile?512:1024,mobile?512:1024); key.shadow.camera.near=1; key.shadow.camera.far=42;
+  key.shadow.camera.left=-18; key.shadow.camera.right=18; key.shadow.camera.top=16; key.shadow.camera.bottom=-10; scene.add(key);
+  const cyan=new THREE.PointLight(0x4de8ff,7,26,2); cyan.position.set(-5,3,-10); scene.add(cyan);
+  const green=new THREE.PointLight(0x55ffb1,5,22,2); green.position.set(6,2,-18); scene.add(green);
+  const white=new THREE.PointLight(0xd8e8ff,4,30,2); white.position.set(0,7,-30); scene.add(white);
+
+  // --- Helpers ---
+  function mat(color,rough=.7,metal=.1,emissive=0x000000,ei=0){
+    return new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal,emissive,emissiveIntensity:ei});
+  }
+  function box(w,h,d,material){
+    const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material); m.castShadow=!mobile; m.receiveShadow=true; return m;
+  }
+  function roundedPanel(w,h,d,material){
+    const m=box(w,h,d,material); return m;
+  }
+
+  // --- A cinematic network gallery rather than a literal server room ---
+  // The background is intentionally spacious and soft like a game-engine scene:
+  // reflective floor, fog, translucent architecture, floating network traces and
+  // distant particulate matter. The networking identity comes from the geometry.
+  const world=new THREE.Group(); scene.add(world);
+
+  const floorMat=new THREE.MeshPhysicalMaterial({color:0x172126,roughness:.18,metalness:.76,clearcoat:1,clearcoatRoughness:.08});
+  const floor=box(46,.34,100,floorMat); floor.position.set(0,-2.0,-34); floor.receiveShadow=true; world.add(floor);
+  const floorGlow=new THREE.Mesh(new THREE.PlaneGeometry(44,96),new THREE.MeshBasicMaterial({color:0x12343b,transparent:true,opacity:.12,blending:THREE.AdditiveBlending}));
+  floorGlow.rotation.x=-Math.PI/2; floorGlow.position.set(0,-1.81,-34); world.add(floorGlow);
+
+  // Long reflective architectural panels create parallax and soft highlights.
+  const architecture=new THREE.Group(); world.add(architecture);
+  for(let i=0;i<10;i++){
+    const z=5-i*8.5;
+    const width=4.5+(i%3)*1.4;
+    const left=box(.08,8.5,width,new THREE.MeshPhysicalMaterial({color:0x8aa7ad,roughness:.22,metalness:.52,transmission:.08,transparent:true,opacity:.26,clearcoat:1}));
+    left.position.set(-10.5,2.1,z); left.rotation.y=.08; architecture.add(left);
+    const right=left.clone(); right.position.x=10.5; right.rotation.y=-.08; architecture.add(right);
+    const light=box(0.035,6.8,width*.65,new THREE.MeshBasicMaterial({color:i%2?0x64ffad:0x8feaff,transparent:true,opacity:.16,blending:THREE.AdditiveBlending}));
+    light.position.set(-10.38,2.2,z); light.rotation.y=.08; architecture.add(light);
+    const light2=light.clone(); light2.position.x=10.38; light2.rotation.y=-.08; architecture.add(light2);
+  }
+
+  // Soft ceiling bands: these become streaks in the periphery as the camera travels.
+  for(let z=4;z>-82;z-=10){
+    const band=box(16,.06,1.0,new THREE.MeshPhysicalMaterial({color:0xb9d5d7,roughness:.25,metalness:.25,emissive:0x29464b,emissiveIntensity:.35,transparent:true,opacity:.48}));
+    band.position.set(0,8.7,z); world.add(band);
+    const glow=box(11,.025,.24,new THREE.MeshBasicMaterial({color:0xd9ffff,transparent:true,opacity:.28,blending:THREE.AdditiveBlending}));
+    glow.position.set(0,8.61,z); world.add(glow);
+  }
+
+  // Network spine: a huge translucent topology structure sits in the distance.
+  const spine=new THREE.Group(); spine.position.set(0,.9,-24); world.add(spine);
+  const spineCore=new THREE.Mesh(new THREE.IcosahedronGeometry(3.15,2),new THREE.MeshPhysicalMaterial({color:0x1d3940,roughness:.32,metalness:.2,transmission:.28,transparent:true,opacity:.20,clearcoat:1})); spine.add(spineCore);
+  const spineRing=new THREE.Mesh(new THREE.TorusGeometry(4.15,.028,10,220),new THREE.MeshBasicMaterial({color:0x8ef4ff,transparent:true,opacity:.34,blending:THREE.AdditiveBlending})); spineRing.rotation.x=Math.PI/2; spine.add(spineRing);
+  const spineRing2=spineRing.clone(); spineRing2.scale.set(.72,.72,.72); spineRing2.rotation.x=.85; spineRing2.rotation.y=.55; spine.add(spineRing2);
+
+  // Fiber-like topology traces, with gentle curvature and no hard HUD styling.
+  function tubePath(points,radius,material){
+    const curve=new THREE.CatmullRomCurve3(points);
+    return new THREE.Mesh(new THREE.TubeGeometry(curve,80,radius,7,false),material);
+  }
+  const cableGroup=new THREE.Group(); world.add(cableGroup);
+  const cableMatA=new THREE.MeshPhysicalMaterial({color:0x0b1b20,roughness:.3,metalness:.58,clearcoat:.5});
+  const cableMatB=new THREE.MeshBasicMaterial({color:0x78ecff,transparent:true,opacity:.52,blending:THREE.AdditiveBlending});
+  for(let i=0;i<(mobile?6:11);i++){
+    const x=-5.4+i*1.08;
+    const pts=[new THREE.Vector3(x,1.0,3),new THREE.Vector3(x*1.08,2.0,-7),new THREE.Vector3(x*.62,1.1,-18),new THREE.Vector3(x*.35,2.8,-30),new THREE.Vector3(-x*.2,1.3,-46),new THREE.Vector3(-x*.1,2.0,-70)];
+    cableGroup.add(tubePath(pts,.055,cableMatA));
+    cableGroup.add(tubePath(pts,.018,cableMatB));
+  }
+
+  // Small physical node clusters give the environment a networking vocabulary.
+  const nodeGroup=new THREE.Group(); world.add(nodeGroup);
+  const nodeMat=new THREE.MeshPhysicalMaterial({color:0x8de8e5,roughness:.2,metalness:.42,emissive:0x0c4d4b,emissiveIntensity:1.2});
+  for(let i=0;i<22;i++){
+    const node=new THREE.Mesh(new THREE.SphereGeometry(.075+(i%3)*.018,10,10),nodeMat);
+    node.position.set((Math.random()-.5)*13,Math.random()*5-1,-5-Math.random()*62);
+    nodeGroup.add(node);
+  }
+
+  // A sparse volumetric field. These are deliberately low contrast: the hero object
+  // should remain the visual focus while the world still has atmospheric depth.
+  const dustCount=mobile?900:2600;
+  const dp=new Float32Array(dustCount*3);
+  for(let i=0;i<dustCount;i++){
+    dp[i*3]=(Math.random()-.5)*38; dp[i*3+1]=-1+Math.random()*11; dp[i*3+2]=6-Math.random()*88;
+  }
+  const dg=new THREE.BufferGeometry(); dg.setAttribute('position',new THREE.BufferAttribute(dp,3));
+  const dust=new THREE.Points(dg,new THREE.PointsMaterial({color:0xb7d5d8,size:mobile?.022:.032,transparent:true,opacity:.16,depthWrite:false,sizeAttenuation:true})); world.add(dust);
+
+  // Reflective circular landing pads echo the reference site's physical stage language.
+  const padGroup=new THREE.Group(); world.add(padGroup);
+  for(let i=0;i<(mobile?3:5);i++){
+    const z=2-i*15;
+    const pad=new THREE.Mesh(new THREE.CylinderGeometry(5.2-i*.35,5.5-i*.35,.18,mobile?40:96),new THREE.MeshPhysicalMaterial({color:0x24373b,roughness:.17,metalness:.72,clearcoat:1,transparent:true,opacity:.76}));
+    pad.position.set(0,-1.72,z); padGroup.add(pad);
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(4.35-i*.3,.018,8,mobile?80:180),new THREE.MeshBasicMaterial({color:i%2?0x64ffad:0x8feaff,transparent:true,opacity:.22,blending:THREE.AdditiveBlending}));
+    ring.rotation.x=Math.PI/2; ring.position.set(0,-1.59,z); padGroup.add(ring);
+  }
+
+  // Keep the names used by the animation loop, but make rackGroup a subtle set of
+  // architectural pillars instead of literal server racks.
+  const rackGroup=new THREE.Group(); world.add(rackGroup);
+  for(let i=0;i<12;i++){
+    const p=box(.18,5.6,.18,new THREE.MeshPhysicalMaterial({color:0x718e93,roughness:.26,metalness:.58,clearcoat:.8,transparent:true,opacity:.35}));
+    p.position.set((i%2?-1:1)*(5.6+Math.floor(i/2)*.32),1.0,-4-Math.floor(i/2)*8.2); rackGroup.add(p);
+  }
+
+  // Moving packets follow the fiber lanes like tiny luminous bits of network traffic.
+  const packetGroup=new THREE.Group(); world.add(packetGroup);
+  const packets=[];
+  for(let i=0;i<(mobile?28:75);i++){
+    const g=new THREE.SphereGeometry(.028+Math.random()*.018,8,8);
+    const m=new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:i%3?0x7deaff:0x64ffad}));
+    m.userData.offset=Math.random(); m.userData.lane=Math.floor(Math.random()*(mobile?6:11)); packetGroup.add(m); packets.push(m);
+  }
+
+  // A huge translucent dome creates the softly lit, studio-like background volume.
+  const membrane=new THREE.Mesh(new THREE.SphereGeometry(26,48,32),new THREE.MeshPhysicalMaterial({color:0x102a30,roughness:.16,metalness:.08,transmission:.34,transparent:true,opacity:.055,side:THREE.BackSide,clearcoat:1}));
+  membrane.position.set(0,2,-38); world.add(membrane);
+
+  const pointer={x:0,y:0,tx:0,ty:0};
+  addEventListener('pointermove',e=>{pointer.tx=e.clientX/innerWidth-.5;pointer.ty=e.clientY/innerHeight-.5},{passive:true});
+  let scroll=0,target=0,t=0;
+  function update(){target=Math.max(0,Math.min(1,scrollY/Math.max(1,document.documentElement.scrollHeight-innerHeight)));}
+  addEventListener('scroll',update,{passive:true}); update();
+
+  // Chapter positions: every portfolio section is a different location in the same facility.
+  function chapter(s){
+    // hero=clean entrance; about=server aisle; skills=fiber junction; work=core; tools=lab; activity=telemetry; contact=exit
+    const q=s*6;
+    return {
+      z: 10-q*11.5,
+      x: Math.sin(s*Math.PI*1.5)*2.2,
+      y: 2.6+Math.sin(s*Math.PI)*1.1,
+      lookZ: -8-q*11.5
+    };
+  }
+
+  function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight,false);}
+  addEventListener('resize',resize,{passive:true}); resize();
+
+  let mobileFrame=0;
+  function render(){
+    requestAnimationFrame(render);
+    if(mobile && (++mobileFrame%2)) return;
+    t+=mobile?.008:.005;
+    scroll+=(target-scroll)*.032;
+    pointer.x+=(pointer.tx-pointer.x)*.035; pointer.y+=(pointer.ty-pointer.y)*.035;
+    const c=chapter(scroll);
+    camera.position.x=c.x+pointer.x*(mobile?.45:1.15)+Math.sin(t*.16)*.18;
+    camera.position.y=c.y-pointer.y*(mobile?.25:.55);
+    camera.position.z=c.z;
+    const look=new THREE.Vector3(pointer.x*.7,1.2,c.lookZ);
+    camera.lookAt(look);
+
+    // Physical world progression — not a background image changing; the camera moves through it.
+    world.position.z=scroll*9;
+    world.rotation.y=Math.sin(scroll*Math.PI*1.3)*.035;
+    rackGroup.position.x=Math.sin(t*.11)*.08;
+    cableGroup.position.x=Math.sin(t*.18)*.12;
+    spine.position.y=1.5+Math.sin(t*.45)*.035;
+    spine.rotation.y=Math.sin(t*.25)*.04;
+    spineRing.rotation.z=t*.18;
+    dust.rotation.y=t*.008;
+    dust.position.x=Math.sin(t*.08)*.7;
+    membrane.rotation.y=t*.012+scroll*.3;
+
+    // Moving packet traffic makes the networking theme functional-looking, not decorative.
+    packets.forEach((p,i)=>{
+      const lane=p.userData.lane;
+      const x=-7.2+lane*1.55;
+      const progress=(p.userData.offset+t*.035*(1+(i%4)*.18))%1;
+      const z=3-progress*75;
+      const y=1.8+Math.sin(progress*Math.PI*3+i)*.48+(lane%2)*.18;
+      p.position.set(x+Math.sin(progress*8+i)*.22,y,z);
+      p.scale.setScalar(1+Math.sin(progress*Math.PI)*.8);
+    });
+
+    // Cinematic lighting adapts to each chapter.
+    const chapterMix=Math.sin(scroll*Math.PI);
+    key.position.set(-7+scroll*13,10+chapterMix*4,7-scroll*50);
+    cyan.position.set(-5+Math.sin(t*.22)*3,3,-10-scroll*38);
+    green.position.set(6+Math.cos(t*.18)*2,2,-18-scroll*42);
+    white.position.set(0,7,-30-scroll*45);
+    renderer.toneMappingExposure=1.0+chapterMix*.18;
+
+    renderer.render(scene,camera);
+  }
+  render();
+})();
+
+// Add a richer magnetic feel to the primary action without changing its behavior.
+(function initPremiumButtonMotion(){
+  if(window.matchMedia('(pointer:coarse)').matches) return;
+  document.querySelectorAll('a.btn, button.btn').forEach(btn=>{
+    btn.addEventListener('pointermove',e=>{
+      const r=btn.getBoundingClientRect();
+      const x=e.clientX-r.left-r.width/2, y=e.clientY-r.top-r.height/2;
+      btn.style.setProperty('--mx',`${((e.clientX-r.left)/r.width)*100}%`);
+      btn.style.setProperty('--my',`${((e.clientY-r.top)/r.height)*100}%`);
+      const strength=btn.classList.contains('primary')?.075:.045;
+      btn.style.transform=`translate(${x*strength}px,${y*strength}px) translateY(-3px) scale(1.025)`;
+    });
+    btn.addEventListener('pointerleave',()=>{btn.style.transform='';btn.style.setProperty('--mx','50%');btn.style.setProperty('--my','50%')});
   });
 })();
 </script>
