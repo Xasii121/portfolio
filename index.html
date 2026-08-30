@@ -1869,7 +1869,7 @@ if(container && typeof THREE !== 'undefined' && !prefersReducedMotion) {
   const dustGeo=new THREE.BufferGeometry(); dustGeo.setAttribute('position',new THREE.BufferAttribute(dustPos,3));
   const dust=new THREE.Points(dustGeo,new THREE.PointsMaterial({color:0xb7d5d8,size:mobileHero?.018:.026,transparent:true,opacity:.12,depthWrite:false,sizeAttenuation:true})); root.add(dust);
 
-  const pointer={x:0,y:0,tx:0,ty:0,px:0,py:0,velocity:0,localX:0,localY:0,localZ:2.15};
+  const pointer={x:0,y:0,tx:0,ty:0,px:0,py:0,velocity:0,localX:0,localY:0,localZ:2.15,localVX:0,localVY:0,localVZ:0};
   const pointerNdc=new THREE.Vector2();
   const pointerRay=new THREE.Raycaster();
   const pointerHit=new THREE.Vector3();
@@ -1911,10 +1911,17 @@ if(container && typeof THREE !== 'undefined' && !prefersReducedMotion) {
     const now=performance.now(), dt=Math.max(8,now-lastPointerTime);
     const dx=pointer.tx-lastPointerX, dy=pointer.ty-lastPointerY;
     pointer.velocity=Math.min(2.5,Math.sqrt(dx*dx+dy*dy)/(dt/16.67)*12);
+    // Convert the cursor movement into a smooth local-space drag vector.
+    // This is intentionally a pull/drag field, not a repulsion field: the
+    // particles stay dense and return to their original positions naturally.
+    const moveScale=Math.min(1.8, pointer.velocity);
+    pointer.localVX += ((dx*3.2)-pointer.localVX)*.22*moveScale;
+    pointer.localVY += ((-dy*3.2)-pointer.localVY)*.22*moveScale;
+    pointer.localVZ += ((dx+dy)*.55-pointer.localVZ)*.12*moveScale;
     lastPointerX=pointer.tx; lastPointerY=pointer.ty; lastPointerTime=now;
     if(pointer.velocity>.08 && sfx && sfx.enabled) sfx.playParticleMove(pointer.velocity);
   },{passive:true});
-  host.addEventListener('pointerleave',()=>{pointer.tx=0;pointer.ty=0;hover=0;});
+  host.addEventListener('pointerleave',()=>{pointer.tx=0;pointer.ty=0;hover=0;pointer.localVX=0;pointer.localVY=0;pointer.localVZ=0;});
   function startParticleDive(){
     if(zoomTarget > .9 || zoomIn > .88) return;
     zoomTarget=1; zoomPulse=1;
@@ -1959,36 +1966,44 @@ if(container && typeof THREE !== 'undefined' && !prefersReducedMotion) {
     clouds.rotation.y=time*.0045;
 
     const pos=geo.attributes.position.array;
-    // Physical 3D cursor force: the mouse ray hits the globe, and nearby
-    // particles are displaced around that exact surface point. The radius is
-    // intentionally large enough to make the movement obvious.
+    // Soft 3D drag field: nearby particles are carried by the cursor motion
+    // instead of being pushed away. Every frame their target is computed from
+    // the original base position, so releasing the cursor lets the whole
+    // surface elastically return to its exact starting shape.
     const cursorX=pointer.localX, cursorY=pointer.localY, cursorZ=pointer.localZ;
-    const forceRadius=1.28 + hover*.42;
-    const forceStrength=1.12 + Math.min(2.2,pointer.velocity)*.42;
+    const dragRadius=1.42;
+    const dragStrength=(.20+Math.min(1.0,pointer.velocity)*.22)*hover;
+    const dragX=pointer.localVX*dragStrength;
+    const dragY=pointer.localVY*dragStrength;
+    const dragZ=pointer.localVZ*dragStrength;
+    const nowHover=hover;
     for(let i=0;i<particleCount;i++){
-      const j=i*3; let x=base[j],y=base[j+1],z=base[j+2];
+      const j=i*3;
+      let x=base[j],y=base[j+1],z=base[j+2];
       const dx=x-cursorX,dy=y-cursorY,dz=z-cursorZ;
       const dist=Math.sqrt(dx*dx+dy*dy+dz*dz)+.001;
-      if(dist<forceRadius){
-        const f=Math.pow(1-dist/forceRadius,2);
-        const falloff=f*(.72+hover*.62)*forceStrength;
-        x+=dx/dist*falloff; y+=dy/dist*falloff; z+=dz/dist*(falloff*.86);
-        // Add a tiny tangential flow so the field feels like particles being
-        // displaced through air rather than simply scaled away from a point.
-        const swirl=f*.12*(pointer.x*dy-pointer.y*dx);
-        x+=(-dy)*swirl; y+=dx*swirl;
+      if(dist<dragRadius){
+        const f=Math.pow(1-dist/dragRadius,2);
+        // A soft directional drag with a tiny rotational component. Because
+        // the field follows pointer velocity, moving the mouse continuously
+        // pulls a ribbon of particles along rather than punching a hole.
+        const edge=0.16+0.84*f;
+        x += dragX*f*edge;
+        y += dragY*f*edge;
+        z += dragZ*f*edge;
+        const swirl=f*f*(pointer.localVX-pointer.localVY)*.035;
+        x += -dy*swirl;
+        y += dx*swirl;
       }
-      // A softer volumetric wake follows the cursor's local position. This
-      // gives the rear layer a delayed reaction, making the globe feel alive
-      // instead of behaving like a flat interactive image.
-      const bx=x-cursorX*.72, by=y-cursorY*.72, bz=z-cursorZ*.35;
-      const wakeDist=Math.sqrt(bx*bx+by*by+bz*bz)+.001;
-      if(wakeDist<2.05){
-        const wf=Math.pow(1-wakeDist/2.05,2)*.18*hover;
-        x+=(-cursorX)*wf; y+=(-cursorY)*wf; z+=(-cursorZ)*wf*.45;
+      // A broader, much weaker wake keeps the motion fluid without creating
+      // visible gaps in the globe. It decays automatically when the pointer
+      // stops because dragX/Y/Z decay toward zero.
+      const wx=x-cursorX*.82, wy=y-cursorY*.82, wz=z-cursorZ*.42;
+      const wd=Math.sqrt(wx*wx+wy*wy+wz*wz)+.001;
+      if(wd<2.35){
+        const wf=Math.pow(1-wd/2.35,3)*.075*nowHover;
+        x += dragX*wf; y += dragY*wf; z += dragZ*wf*.65;
       }
-      // During the dive, particles accelerate toward the camera and peel
-      // outward, creating the sensation of physically passing through the globe.
       if(diveEase>0.001){
         const len=Math.sqrt(x*x+y*y+z*z)+.001;
         const spread=diveEase*(.55 + (i%7)/7*.55);
@@ -1997,10 +2012,13 @@ if(container && typeof THREE !== 'undefined' && !prefersReducedMotion) {
         z += diveEase*(1.8 + (seed[i]-.5)*2.0);
       }
       const wave=Math.sin(time*.95+phase[i])*0.012;
-      x+=wave*(.35+seed[i]); y+=Math.cos(time*.72+phase[i]*1.7)*.009; z+=Math.sin(time*.6+phase[i])*0.011;
-      // Scroll gently changes the object's pose, as if the camera is passing a physical sculpture.
+      x+=wave*(.35+seed[i]);
+      y+=Math.cos(time*.72+phase[i]*1.7)*.009;
+      z+=Math.sin(time*.6+phase[i])*.011;
       x+=Math.sin(scrollProgress*Math.PI*2)*.08*(1-seed[i]);
-      pos[j]+=(x-pos[j])*.085; pos[j+1]+=(y-pos[j+1])*.085; pos[j+2]+=(z-pos[j+2])*.085;
+      pos[j]+=(x-pos[j])*.10;
+      pos[j+1]+=(y-pos[j+1])*.10;
+      pos[j+2]+=(z-pos[j+2])*.10;
     }
     geo.attributes.position.needsUpdate=true;
     fill.position.x=-3.2+Math.sin(time*.27)*.55; rim.position.x=3.4+Math.cos(time*.22)*.65;
